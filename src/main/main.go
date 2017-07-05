@@ -4,6 +4,7 @@ import (
     "fmt"
     "net/http"
     "strconv"
+    "encoding/json"
     "io/ioutil"
     "html/template"
     "log"
@@ -14,19 +15,16 @@ var host string = ""
 var port int = 8080
 var templates map[string] *template.Template
 
-type Context struct {
-    Session string
-    Day int
-    Play string
-}
-
 func main() {
     templates = make(map[string] *template.Template)
     templateLoader("temp", "templates/temp.html")
     templateLoader("start", "templates/start.html")
 
+    InitSessions()
+
     http.HandleFunc("/", looking404)
     http.HandleFunc("/start", start)
+    http.HandleFunc("/endDay", endDay)
     http.HandleFunc("/temp", tempFunc)
     log.Println("Server up and running on", host + ":" + strconv.Itoa(port))
     http.ListenAndServe(host + ":" + strconv.Itoa(port), nil)
@@ -38,7 +36,19 @@ func looking404(w http.ResponseWriter, req *http.Request) {
 
 func start(w http.ResponseWriter, req *http.Request) {
     log.Println("Start");
-    templates["start"].Execute(w, Context{NewPlaySession(), 0, ""})
+    templates["start"].Execute(w, NewPlaySession())
+}
+
+func endDay(w http.ResponseWriter, req *http.Request) {
+    log.Println("End of Day");
+    decoder := json.NewDecoder(req.Body)
+    var session Context
+    err := decoder.Decode(&session)
+    if err != nil { log.Panic(err) }
+    // log.Println(tempJson)
+    // log.Println(reflect.TypeOf(tempJson))
+    newDay := EndDay(session.Session, session.Commands)
+    templates["start"].Execute(w, newDay)
 }
 
 func tempFunc(w http.ResponseWriter, req *http.Request) {
@@ -47,10 +57,10 @@ func tempFunc(w http.ResponseWriter, req *http.Request) {
 
 func templateLoader(name string, templateFile string) {
     stream, err := ioutil.ReadFile(templateFile)
-    if err != nil {log.Panic(err)}
+    if err != nil { log.Panic(err) }
     // fmt.Println(string(stream))
     tempTemplate, err := template.New(name).Parse(string(stream))
-    if err != nil {log.Panic(err)}
+    if err != nil { log.Panic(err) }
     templates[name] = tempTemplate
 }
 
