@@ -36,7 +36,9 @@ func looking404(w http.ResponseWriter, req *http.Request) {
 
 func start(w http.ResponseWriter, req *http.Request) {
     log.Println("Start");
-    templates["start"].Execute(w, NewPlaySession())
+    context := NewPlaySession()
+    log.Println("Start", context);
+    templates["start"].Execute(w, context)
 }
 
 func endDay(w http.ResponseWriter, req *http.Request) {
@@ -47,7 +49,7 @@ func endDay(w http.ResponseWriter, req *http.Request) {
     if err != nil { log.Panic(err) }
     // log.Println(tempJson)
     // log.Println(reflect.TypeOf(tempJson))
-    newDay := EndDay(session.Session, session.Commands)
+    newDay := EndDay(session.session, session.commands)
     templates["start"].Execute(w, newDay)
 }
 
