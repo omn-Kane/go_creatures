@@ -21,8 +21,8 @@ func main() {
     templateLoader("start", "templates/start.html")
 
     InitSessions()
-
-    http.HandleFunc("/", looking404)
+    fs := http.FileServer(http.Dir(""))
+    http.Handle("/", fs)
     http.HandleFunc("/start", start)
     http.HandleFunc("/endDay", endDay)
     http.HandleFunc("/temp", tempFunc)
@@ -48,6 +48,7 @@ func endDay(w http.ResponseWriter, req *http.Request) {
     if err != nil { log.Panic(err) }
     // log.Println(tempJson)
     // log.Println(reflect.TypeOf(tempJson))
+    log.Println("End of Day1", session.Session)
     newDay := EndDay(session.Session)
     if newDay.Play.Resources < 0 {
         err = templates["start"].Execute(w, NewPlaySession())

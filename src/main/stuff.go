@@ -1,7 +1,7 @@
 package main
 
 import (
-    // "log"
+    "log"
     "math/rand"
     "time"
 )
@@ -67,9 +67,11 @@ func EndDay(session string) Context {
 func (session *Context) CompleteDay() {
     session.Day += 1
     session.Play.Resources -= session.Play.CreaturesCost
-    if session.Play.Resources < 0 { return }
+    if session.Play.Resources <= 0 { return }
+
     session.Play.AgeCreatures()
     session.Play.SetTotalCost()
+    log.Println("End of Day2", session)
 }
 
 func (playDict *PlayDict) SetTotalCost() {
