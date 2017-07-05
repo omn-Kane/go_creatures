@@ -2,11 +2,13 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>First Template</title>
+    <title>Start</title>
 </head>
 <body>
-    <h1>My session: {{.session}}</h1>
-    <h1>Current Day: {{.day}}</h1>
-    <h1>Current Play: {{.play}}</h1>
+    <h1>My session: {{.Session}}</h1>
+    <h1>Current Day: {{.Day}}</h1>
+    <h1>Current Resource: {{.Play.Resources}}</h1>
+    <h1>Current Creatures Cost: {{.Play.CreaturesCost}}</h1>
+    <h1>Current Play: {{index .Play.Creatures 0}}</h1>
 </body>
 </html>

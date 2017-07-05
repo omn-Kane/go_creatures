@@ -35,22 +35,27 @@ func looking404(w http.ResponseWriter, req *http.Request) {
 }
 
 func start(w http.ResponseWriter, req *http.Request) {
-    log.Println("Start");
-    context := NewPlaySession()
-    log.Println("Start", context);
-    templates["start"].Execute(w, context)
+    log.Println("Start")
+    err := templates["start"].Execute(w, NewPlaySession())
+    if err != nil { log.Panic(err) }
 }
 
 func endDay(w http.ResponseWriter, req *http.Request) {
-    log.Println("End of Day");
+    log.Println("End of Day")
     decoder := json.NewDecoder(req.Body)
     var session Context
     err := decoder.Decode(&session)
     if err != nil { log.Panic(err) }
     // log.Println(tempJson)
     // log.Println(reflect.TypeOf(tempJson))
-    newDay := EndDay(session.session, session.commands)
-    templates["start"].Execute(w, newDay)
+    newDay := EndDay(session.Session)
+    if newDay.Play.Resources < 0 {
+        err = templates["start"].Execute(w, NewPlaySession())
+    } else {
+        err = templates["start"].Execute(w, newDay)
+    }
+
+    if err != nil { log.Panic(err) }
 }
 
 func tempFunc(w http.ResponseWriter, req *http.Request) {

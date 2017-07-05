@@ -7,9 +7,9 @@ import (
 )
 
 type PlayDict struct {
-    resources int
-    creatures []Creature
-    creaturesCost int
+    Resources int
+    Creatures []*Creature
+    CreaturesCost int
 }
 
 type Command struct {
@@ -17,10 +17,10 @@ type Command struct {
 }
 
 type Context struct {
-    session string
-    day int
-    play PlayDict
-    commands map[string] Command
+    Session string
+    Day int
+    Play PlayDict
+    Commands map[string] Command
 }
 
 var sessions map[string] *Context
@@ -40,9 +40,9 @@ func NewPlaySession() Context {
         byteArray[i] = letterRunes[rand.Intn(len(letterRunes))]
     }
 
-    male := Creature{MALE, 3}
-    female := Creature{FEMALE, 3}
-    creatures := []Creature{male, female}
+    male := &Creature{MALE, 3}
+    female := &Creature{FEMALE, 3}
+    creatures := []*Creature{male, female}
     playDict := PlayDict{startingResources, creatures, 0}
     playDict.SetTotalCost()
 
@@ -50,29 +50,34 @@ func NewPlaySession() Context {
     commands["breed"] = Command{"more"}
 
     session := Context{string(byteArray), 0, playDict, commands}
-    sessions[session.session] = &session
+    sessions[session.Session] = &session
     // log.Println("NewSession", session.play);
     return session
 }
 
-func EndDay(session string, commands map[string] Command) Context {
+func EndDay(session string) Context {
     currentSession, sessionFound := sessions[session]
     // log.Println("EndDay", currentSession, sessionFound);
     if !sessionFound { return NewPlaySession() }
 
-    currentSession.CompleteDay(commands)
+    currentSession.CompleteDay()
     return *currentSession
 }
 
-func (session *Context) CompleteDay(commands map[string] Command) {
-    session.day += 1
+func (session *Context) CompleteDay() {
+    session.Day += 1
+    session.Play.Resources -= session.Play.CreaturesCost
+    if session.Play.Resources < 0 { return }
+    session.Play.AgeCreatures()
+    session.Play.SetTotalCost()
 }
 
 func (playDict *PlayDict) SetTotalCost() {
     var totalCost int = 0
-    for _, creature := range playDict.creatures {
-        totalCost += creature.Cost()
-    }
+    for _, creature := range playDict.Creatures { totalCost += creature.Cost() }
+    playDict.CreaturesCost = totalCost
+}
 
-    playDict.creaturesCost = totalCost
+func (playDict *PlayDict) AgeCreatures() {
+    for _, creature := range playDict.Creatures { creature.age += 1 }
 }
