@@ -1,7 +1,7 @@
 package main
 
 import (
-    "log"
+    // "log"
     "math/rand"
     "time"
 )
@@ -43,8 +43,8 @@ func NewPlaySession(session string) Context {
         session = string(byteArray)
     }
 
-    male := &Creature{MALE, 3}
-    female := &Creature{FEMALE, 3}
+    male := &Creature{ID:0, Sex:MALE, Age:3}
+    female := &Creature{ID:1, Sex:FEMALE, Age:3}
     creatures := []*Creature{male, female}
     playDict := PlayDict{startingResources, creatures, 0}
     playDict.SetTotalCost()
@@ -59,12 +59,23 @@ func NewPlaySession(session string) Context {
 }
 
 func EndDay(session string) Context {
-    currentSession, sessionFound := sessions[session]
+    currentSession, foundSession := sessions[session]
     // log.Println("EndDay", currentSession, sessionFound);
-    if !sessionFound { return NewPlaySession(session) }
+    if !foundSession { return NewPlaySession(session) }
 
     currentSession.CompleteDay()
     return *currentSession
+}
+
+func BreedWith(session string, creature1ID int, creature2ID int) bool {
+    currentSession, sessionFound := sessions[session]
+    // log.Println("EndDay", currentSession, sessionFound);
+    if !sessionFound { return false }
+    creature1 := currentSession.Play.Creatures[creature1ID]
+    // if !foundCreature1 { return false }
+    creature2 := currentSession.Play.Creatures[creature2ID]
+    // if !foundCreature2 { return false }
+    return creature1.BreedWith(creature2)
 }
 
 func (session *Context) CompleteDay() {
@@ -74,7 +85,6 @@ func (session *Context) CompleteDay() {
 
     session.Play.AgeCreatures()
     session.Play.SetTotalCost()
-    log.Println("End of Day2", session)
 }
 
 func (playDict *PlayDict) SetTotalCost() {
@@ -84,5 +94,5 @@ func (playDict *PlayDict) SetTotalCost() {
 }
 
 func (playDict *PlayDict) AgeCreatures() {
-    for _, creature := range playDict.Creatures { creature.age += 1 }
+    for _, creature := range playDict.Creatures { creature.Age += 1 }
 }

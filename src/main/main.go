@@ -27,6 +27,7 @@ func main() {
     http.Handle("/", fs)
     http.HandleFunc("/start/", start)
     http.HandleFunc("/endDay", endDay)
+    http.HandleFunc("/breedWith", breedWith)
     http.HandleFunc("/temp/", tempFunc)
     log.Println("Server up and running on", host + ":" + strconv.Itoa(port))
     http.ListenAndServe(host + ":" + strconv.Itoa(port), nil)
@@ -43,7 +44,7 @@ func start(w http.ResponseWriter, req *http.Request) {
 }
 
 func endDay(w http.ResponseWriter, req *http.Request) {
-    log.Println("End of Day")
+    // log.Println("End of Day")
     session := getParam(req, "Session", 0)
     newDay := EndDay(session)
     if newDay.Play.Resources < 0 {
@@ -53,6 +54,15 @@ func endDay(w http.ResponseWriter, req *http.Request) {
         err := templates["start"].Execute(w, newDay)
         if err != nil { log.Panic(err) }
     }
+}
+
+func breedWith(w http.ResponseWriter, req *http.Request) {
+    log.Println("BreedWith")
+    session := getParam(req, "Session", 0)
+    creature1ID, _ := strconv.Atoi(getParam(req, "Creature1ID", 0))
+    creature2ID, _ := strconv.Atoi(getParam(req, "Creature2ID", 0))
+    result := BreedWith(session, creature1ID, creature2ID)
+    fmt.Fprintf(w, strconv.FormatBool(result))
 }
 
 func tempFunc(w http.ResponseWriter, req *http.Request) {

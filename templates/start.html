@@ -11,7 +11,8 @@
     <h1>Current Day: {{.Day}}</h1>
     <h1>Current Resource: {{.Play.Resources}}</h1>
     <h1>Current Creatures Cost: {{.Play.CreaturesCost}}</h1>
-    <h1>Current Play: {{index .Play.Creatures 0}}</h1>
+    <h1>Current Play: {{index .Play.Creatures 0}}{{index .Play.Creatures 1}}</h1>
     <a href="/endDay?Session={{.Session}}">End Day</a>
+    <input type="button" value="BreedWith" onClick="breedWith({{.Session}}, {{$creature1 := index .Play.Creatures 0}}{{$creature1.ID}}, {{$creature2 := index .Play.Creatures 1}}{{$creature2.ID}})"></a>
 </body>
 </html>
