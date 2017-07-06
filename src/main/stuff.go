@@ -33,11 +33,14 @@ func InitSessions() {
     sessions = make(map[string] *Context)
 }
 
-func NewPlaySession() Context {
-    rand.Seed(time.Now().UnixNano())
-    byteArray := make([]byte, sessionValueLength)
-    for i := range byteArray {
-        byteArray[i] = letterRunes[rand.Intn(len(letterRunes))]
+func NewPlaySession(session string) Context {
+    if session == "" {
+        rand.Seed(time.Now().UnixNano())
+        byteArray := make([]byte, sessionValueLength)
+        for i := range byteArray {
+            byteArray[i] = letterRunes[rand.Intn(len(letterRunes))]
+        }
+        session = string(byteArray)
     }
 
     male := &Creature{MALE, 3}
@@ -49,16 +52,16 @@ func NewPlaySession() Context {
     commands := make(map[string] Command)
     commands["breed"] = Command{"more"}
 
-    session := Context{string(byteArray), 0, playDict, commands}
-    sessions[session.Session] = &session
+    context := Context{session, 0, playDict, commands}
+    sessions[context.Session] = &context
     // log.Println("NewSession", session.play);
-    return session
+    return context
 }
 
 func EndDay(session string) Context {
     currentSession, sessionFound := sessions[session]
     // log.Println("EndDay", currentSession, sessionFound);
-    if !sessionFound { return NewPlaySession() }
+    if !sessionFound { return NewPlaySession(session) }
 
     currentSession.CompleteDay()
     return *currentSession

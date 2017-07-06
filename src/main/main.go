@@ -2,9 +2,11 @@ package main
 
 import (
     "fmt"
+    "net/url"
     "net/http"
     "strconv"
-    "encoding/json"
+    // "strings"
+    // "encoding/json"
     "io/ioutil"
     "html/template"
     "log"
@@ -23,9 +25,9 @@ func main() {
     InitSessions()
     fs := http.FileServer(http.Dir(""))
     http.Handle("/", fs)
-    http.HandleFunc("/start", start)
+    http.HandleFunc("/start/", start)
     http.HandleFunc("/endDay", endDay)
-    http.HandleFunc("/temp", tempFunc)
+    http.HandleFunc("/temp/", tempFunc)
     log.Println("Server up and running on", host + ":" + strconv.Itoa(port))
     http.ListenAndServe(host + ":" + strconv.Itoa(port), nil)
 }
@@ -36,27 +38,21 @@ func looking404(w http.ResponseWriter, req *http.Request) {
 
 func start(w http.ResponseWriter, req *http.Request) {
     log.Println("Start")
-    err := templates["start"].Execute(w, NewPlaySession())
+    err := templates["start"].Execute(w, NewPlaySession(""))
     if err != nil { log.Panic(err) }
 }
 
 func endDay(w http.ResponseWriter, req *http.Request) {
     log.Println("End of Day")
-    decoder := json.NewDecoder(req.Body)
-    var session Context
-    err := decoder.Decode(&session)
-    if err != nil { log.Panic(err) }
-    // log.Println(tempJson)
-    // log.Println(reflect.TypeOf(tempJson))
-    log.Println("End of Day1", session.Session)
-    newDay := EndDay(session.Session)
+    session := getParam(req, "Session", 0)
+    newDay := EndDay(session)
     if newDay.Play.Resources < 0 {
-        err = templates["start"].Execute(w, NewPlaySession())
+        err := templates["start"].Execute(w, NewPlaySession(session))
+        if err != nil { log.Panic(err) }
     } else {
-        err = templates["start"].Execute(w, newDay)
+        err := templates["start"].Execute(w, newDay)
+        if err != nil { log.Panic(err) }
     }
-
-    if err != nil { log.Panic(err) }
 }
 
 func tempFunc(w http.ResponseWriter, req *http.Request) {
@@ -70,6 +66,13 @@ func templateLoader(name string, templateFile string) {
     tempTemplate, err := template.New(name).Parse(string(stream))
     if err != nil { log.Panic(err) }
     templates[name] = tempTemplate
+}
+
+func getParam(req *http.Request, key string, value int) string {
+    req.ParseForm()
+    object, err := url.ParseQuery(req.URL.RawQuery)
+    if err != nil { log.Panic(err) }
+    return object[key][value]
 }
 
 

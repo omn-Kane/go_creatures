@@ -12,6 +12,6 @@
     <h1>Current Resource: {{.Play.Resources}}</h1>
     <h1>Current Creatures Cost: {{.Play.CreaturesCost}}</h1>
     <h1>Current Play: {{index .Play.Creatures 0}}</h1>
-    <input type="button" value="EndDay" onClick="endDay({{.Session}})"/>
+    <a href="/endDay?Session={{.Session}}">End Day</a>
 </body>
 </html>
