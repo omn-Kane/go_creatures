@@ -4,12 +4,14 @@ import (
     "log"
     "math/rand"
     "time"
+    // "reflect"
 )
 
 type PlayDict struct {
     Resources int
-    Creatures []*Creature
+    Creatures map[int] *Creature
     CreaturesCost int
+    MaxCreatureID int
 }
 
 type Command struct {
@@ -29,6 +31,10 @@ var sessionValueLength = 16
 var startingResources = 5000
 var letterRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+func importLog() {
+    log.Println("sigh at import")
+}
+
 func InitSessions() {
     sessions = make(map[string] *Context)
 }
@@ -43,10 +49,11 @@ func NewPlaySession(session string) Context {
         session = string(byteArray)
     }
 
-    male := &Creature{ID:0, Sex:MALE, Age:3}
-    female := &Creature{ID:1, Sex:FEMALE, Age:3}
-    creatures := []*Creature{male, female}
-    playDict := PlayDict{startingResources, creatures, 0}
+    creatures := make(map[int] *Creature)
+    creatures[1] = &Creature{ID:1, Sex:MALE, Age:3}
+    creatures[2] = &Creature{ID:2, Sex:FEMALE, Age:3}
+
+    playDict := PlayDict{startingResources, creatures, 0, 2}
     playDict.SetTotalCost()
 
     commands := make(map[string] Command)
@@ -60,10 +67,9 @@ func NewPlaySession(session string) Context {
 
 func SearchDatabase(session string) Context {
     currentSession := GetRecord(session)
+    if currentSession.Session == "" { return NewPlaySession(session) }
     sessions[currentSession.Session] = &currentSession
-    log.Println(currentSession)
     return currentSession
-    // if currentSession == nil { return NewPlaySession(session) }
 }
 
 func EndDay(session string) Context {
@@ -94,6 +100,10 @@ func (session *Context) CompleteDay() {
     if session.Play.Resources <= 0 { return }
 
     session.Play.AgeCreatures()
+    session.Play.WorkCreatures()
+    session.Play.BreedCreatures()
+    session.Play.GestateCreatures()
+    session.Play.BirthCreatures()
     session.Play.SetTotalCost()
 }
 
@@ -101,6 +111,40 @@ func (playDict *PlayDict) SetTotalCost() {
     var totalCost int = 0
     for _, creature := range playDict.Creatures { totalCost += creature.Cost() }
     playDict.CreaturesCost = totalCost
+}
+
+func (playDict *PlayDict) WorkCreatures() {
+    // for _, creature := range playDict.Creatures {
+    // }
+}
+
+func (playDict *PlayDict) BreedCreatures() {
+    for _, creature := range playDict.Creatures {
+        if creature.Action != BREEDING { continue }
+        creature.Breed()
+    }
+}
+
+func (playDict *PlayDict) GestateCreatures() {
+    for _, creature := range playDict.Creatures {
+        if creature.Action != PREGNANT { continue }
+        creature.Gestate()
+    }
+}
+
+func (playDict *PlayDict) BirthCreatures() {
+    children := []*Creature{}
+    for _, creature := range playDict.Creatures {
+        if creature.Action != SPAWNING { continue }
+        father := playDict.Creatures[creature.PartnerID]
+        children = append(children, creature.SpawnLitter(father)...)
+    }
+
+    for _, creature := range children {
+        playDict.MaxCreatureID += 1
+        creature.ID = playDict.MaxCreatureID
+        playDict.Creatures[creature.ID] = creature
+    }
 }
 
 func (playDict *PlayDict) AgeCreatures() {
