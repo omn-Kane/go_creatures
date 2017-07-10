@@ -50,7 +50,6 @@ func NewPlaySession(session string) Context {
     playDict.SetTotalCost()
 
     commands := make(map[string] Command)
-    commands["breed"] = Command{"more"}
 
     context := Context{session, 0, playDict, commands}
     sessions[context.Session] = &context
@@ -60,7 +59,8 @@ func NewPlaySession(session string) Context {
 }
 
 func SearchDatabase(session string) Context {
-    currentSession := GetRecord(session, 0)
+    currentSession := GetRecord(session)
+    sessions[currentSession.Session] = &currentSession
     log.Println(currentSession)
     return currentSession
     // if currentSession == nil { return NewPlaySession(session) }

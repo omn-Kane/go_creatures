@@ -36,11 +36,11 @@ func (c *Context) InsertRecord() {
     if err != nil { log.Panic(err) }
 }
 
-func GetRecord(session string, day int) Context {
+func GetRecord(session string) Context {
     record := &Context{}
     var tempPlay []byte
 
-    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? AND day=?", session, day).Scan(&record.Session, &record.Day, &tempPlay)
+    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? ORDER BY day DESC LIMIT 1", session).Scan(&record.Session, &record.Day, &tempPlay)
     if err != nil { log.Panic(err) }
 
     err = json.Unmarshal(tempPlay, &record.Play)
