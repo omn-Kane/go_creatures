@@ -1,7 +1,7 @@
 package main
 
 import (
-    // "log"
+    "log"
     "math/rand"
     "time"
 )
@@ -54,16 +54,26 @@ func NewPlaySession(session string) Context {
 
     context := Context{session, 0, playDict, commands}
     sessions[context.Session] = &context
+    context.InsertRecord()
     // log.Println("NewSession", session.play);
     return context
+}
+
+func SearchDatabase(session string) Context {
+    currentSession := GetRecord(session, 0)
+    log.Println(currentSession)
+    return currentSession
+    // if currentSession == nil { return NewPlaySession(session) }
 }
 
 func EndDay(session string) Context {
     currentSession, foundSession := sessions[session]
     // log.Println("EndDay", currentSession, sessionFound);
-    if !foundSession { return NewPlaySession(session) }
+    if !foundSession { return SearchDatabase(session) }
 
     currentSession.CompleteDay()
+    currentSession.InsertRecord()
+
     return *currentSession
 }
 

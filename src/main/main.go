@@ -23,6 +23,8 @@ func main() {
     templateLoader("start", "templates/start.html")
 
     InitSessions()
+    InitDatabases()
+    
     fs := http.FileServer(http.Dir(""))
     http.Handle("/", fs)
     http.HandleFunc("/start/", start)
