@@ -5,15 +5,71 @@
     <title>Start</title>
     <script src="/public/scripts/jquery.min.js"></script>
     <script src="/public/scripts/posts.js"></script>
+    <style>
+        ul {
+            padding: 0;
+            list-style-type: none;
+        }
+        .table {
+            border-spacing: 0px;
+        }
+        .table>thead>tr>th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table>tbody>tr>td {
+            vertical-align: middle;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-    <h1>My session: {{.Session}}</h1>
+    <h1>My session: {{$session := .Session}}</h1>
     <h1>Current Day: {{.Day}}</h1>
-    <h1>Current Resource: {{.Play.Resources}}</h1>
+    <h1>Resources Food: {{.Play.Food}}, Lumber: {{.Play.Lumber}}, Housing: {{.Play.Housing}}</h1>
     <h1>Current Creatures Cost: {{.Play.CreaturesCost}}</h1>
     <h1>Current Creatures: {{len .Play.Creatures}}</h1>
-    <h1>Current Play: {{index .Play.Creatures 1}}{{index .Play.Creatures 2}}</h1>
+    <h1>Current Play:</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th style="width: 100px">Sex</th>
+            <th style="width: 80px">Longevity</th>
+            <th style="width: 50px">Age</th>
+            <th style="width: 70px">Agility</th>
+            <th style="width: 70px">Strength</th>
+            <th style="width: 70px">Intellect</th>
+            <th style="width: 200px; padding-left: 10px;">Current Action</th>
+            <th style="width: 50%">Possible Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $key, $creature := .Play.Creatures }}
+        <tr id="creature_{{$creature.ID}}" style="height: 45px">
+            <td>{{$creature.Sex}}</td>
+            <td>{{$creature.Longevity}}</td>
+            <td>{{$creature.Age}}</td>
+            <td>{{$creature.Agility}}</td>
+            <td>{{$creature.Strength}}</td>
+            <td>{{$creature.Intellect}}</td>
+            <td>
+                <span id="creature_action_{{$creature.ID}}">{{$creature.Action}}</span>
+            </td>
+            <td>
+                {{ if gt $creature.Age 2 }}
+                <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Nothing')"/>
+                <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Breeding')"/>
+                <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Farming')"/>
+                <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Lumberjacking')"/>
+                <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Constructing')"/>
+                <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Sell')"/>
+                {{ end }}
+            </td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
     <a href="/endDay?Session={{.Session}}">End Day</a>
-    <input type="button" value="BreedWith" onClick="breedWith({{.Session}}, {{$creature1 := index .Play.Creatures 1}}{{$creature1.ID}}, {{$creature2 := index .Play.Creatures 2}}{{$creature2.ID}})"></a>
 </body>
 </html>

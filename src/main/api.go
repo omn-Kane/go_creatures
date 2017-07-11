@@ -24,14 +24,16 @@ func main() {
 
     InitSessions()
     InitDatabases()
-    
+
     fs := http.FileServer(http.Dir(""))
     http.Handle("/", fs)
     http.HandleFunc("/start/", start)
     http.HandleFunc("/endDay", endDay)
     http.HandleFunc("/breedWith", breedWith)
+    http.HandleFunc("/setAction", setAction)
     http.HandleFunc("/temp/", tempFunc)
     log.Println("Server up and running on", host + ":" + strconv.Itoa(port))
+    log.Println("Go to http://", host + ":" + strconv.Itoa(port) + "/start/ to start a new session")
     http.ListenAndServe(host + ":" + strconv.Itoa(port), nil)
 }
 
@@ -41,7 +43,8 @@ func looking404(w http.ResponseWriter, req *http.Request) {
 
 func start(w http.ResponseWriter, req *http.Request) {
     log.Println("Start")
-    err := templates["start"].Execute(w, NewPlaySession(""))
+    context := NewPlaySession("")
+    err := templates["start"].Execute(w, context)
     if err != nil { log.Panic(err) }
 }
 
@@ -49,7 +52,7 @@ func endDay(w http.ResponseWriter, req *http.Request) {
     // log.Println("End of Day")
     session := getParam(req, "Session", 0)
     newDay := EndDay(session)
-    if newDay.Play.Resources < 0 {
+    if newDay.Play.Food < 0 {
         err := templates["start"].Execute(w, NewPlaySession(session))
         if err != nil { log.Panic(err) }
     } else {
@@ -65,6 +68,15 @@ func breedWith(w http.ResponseWriter, req *http.Request) {
     creature2ID, _ := strconv.Atoi(getParam(req, "Creature2ID", 0))
     result := BreedWith(session, creature1ID, creature2ID)
     fmt.Fprintf(w, strconv.FormatBool(result))
+}
+
+func setAction(w http.ResponseWriter, req *http.Request) {
+    // log.Println("SetAction")
+    session := getParam(req, "Session", 0)
+    creatureID, _ := strconv.Atoi(getParam(req, "CreatureID", 0))
+    action := getParam(req, "Action", 0)
+    result := SetAction(session, creatureID, action)
+    fmt.Fprintf(w, result)
 }
 
 func tempFunc(w http.ResponseWriter, req *http.Request) {

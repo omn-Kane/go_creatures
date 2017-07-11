@@ -10,27 +10,38 @@ func importLogC() {
 
 const creatureCost int = 5
 const breedingCost int = 10
-const gestationPeriod int = 2 // 1 day breeding, 2 days gestation, 1 day birth
+const gestationPeriod int = 1 // 1 day breeding, 1 day gestation, 1 day birth
 const litterSize int = 1
+const foodProduction int = 1
+const lumberProduction int = 1
+const housingProduction int = 1
 
 const (
     MALE = "Male"
     FEMALE = "Female"
     EPICENE = "Epicene"
+    NOTHING = "Nothing"
     BREEDING = "Breeding"
     PREGNANT = "Pregnant"
     FARMING = "Farming"
     LUMBERJACKING = "Lumberjacking"
+    CONSTRUCTING = "Constructing"
     PONDER = "Ponder"
     SPAWNING = "Spawning"
+    SELL = "Sell"
 )
 
 type Creature struct {
     ID int
     Sex string
+    Longevity int
     Age int
+    Agility int
+    Strength int
+    Intellect int
     Action string
     PartnerID int
+    Partner *Creature
     GestationDay int
     LitterSize int
 }
@@ -73,15 +84,16 @@ func (creature1 *Creature) CanBreedWith(creature2 *Creature) bool {
     return true
 }
 
-func (creature *Creature) Breed() {
+func (creature *Creature) Breed(partner *Creature) {
     if creature.Sex == MALE {
-        creature.Action = ""
+        creature.Action = NOTHING
         creature.PartnerID = 0
         return
     }
 
+    creature.Partner = partner
     creature.Action = PREGNANT
-    creature.GestationDay = 0
+    creature.GestationDay = 1
     creature.LitterSize = litterSize
 }
 
@@ -95,7 +107,7 @@ func (creature *Creature) Gestate() {
 }
 
 func (creature *Creature) SpawnLitter(father *Creature) []*Creature {
-    creature.Action = ""
+    creature.Action = NOTHING
     creature.PartnerID = 0
     creature.GestationDay = 0
     children := []*Creature{}
@@ -109,7 +121,37 @@ func (creature *Creature) SpawnLitter(father *Creature) []*Creature {
 
 func (creature *Creature) Birth(father *Creature) *Creature {
     if father.Age == 0 {
-        return &Creature{Sex:FEMALE, Age:0}
+        return &Creature{Sex:FEMALE, Longevity:20, Age:0, Action: NOTHING}
     }
-    return &Creature{Sex:MALE, Age:0}
+    return &Creature{Sex:MALE, Longevity:20, Age:0, Action: NOTHING}
+}
+
+func (creature *Creature) ProduceFood() int {
+    foodProduced := creature.Agility * foodProduction
+    creature.Agility += 1
+    return foodProduced
+}
+
+func (creature *Creature) ProduceLumber() int {
+    lumberProduced := creature.Strength * lumberProduction
+    creature.Strength += 1
+    return lumberProduced
+}
+
+func (creature *Creature) ProducibleHousing() int {
+    return creature.Intellect * housingProduction
+}
+
+func (creature *Creature) ProduceHousing() int {
+    housingProduced := creature.Intellect * housingProduction
+    creature.Intellect += 1
+    return housingProduced
+}
+
+func (creature *Creature) SetAction(action string) string {
+    if creature.Action != PREGNANT {
+        creature.Action = action
+    }
+
+    return creature.Action
 }
