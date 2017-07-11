@@ -31,6 +31,11 @@ var startingHousing = 4
 var housingCost = 10
 var letterRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+func Random(min, max int) int {
+    rand.Seed(time.Now().Unix())
+    return rand.Intn(max - min) + min
+}
+
 func importLog() {
     log.Println("sigh at import")
 }
@@ -50,8 +55,8 @@ func NewPlaySession(session string) Context {
     }
 
     creatures := make(map[int] *Creature)
-    creatures[1] = &Creature{ID:1, Sex:MALE, Longevity:20, Age:3, Action: NOTHING}
-    creatures[2] = &Creature{ID:2, Sex:FEMALE, Longevity:20, Age:3, Action: NOTHING}
+    creatures[1] = &Creature{ID:1, Sex:MALE, Longevity:20, Age:3, Action: NOTHING, EpiceneChance: 5}
+    creatures[2] = &Creature{ID:2, Sex:FEMALE, Longevity:20, Age:3, Action: NOTHING, EpiceneChance: 5}
 
     playDict := PlayDict{startingFood, startingLumber, startingHousing, creatures, 0, 2}
     playDict.SetTotalCost()
