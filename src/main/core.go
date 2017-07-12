@@ -32,7 +32,6 @@ var housingCost = 10
 var letterRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func Random(min, max int) int {
-    rand.Seed(time.Now().Unix())
     return rand.Intn(max - min) + min
 }
 
@@ -41,12 +40,12 @@ func importLog() {
 }
 
 func InitSessions() {
+    rand.Seed(time.Now().UnixNano())
     sessions = make(map[string] *Context)
 }
 
 func NewPlaySession(session string) Context {
     if session == "" {
-        rand.Seed(time.Now().UnixNano())
         byteArray := make([]byte, sessionValueLength)
         for i := range byteArray {
             byteArray[i] = letterRunes[rand.Intn(len(letterRunes))]

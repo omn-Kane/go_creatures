@@ -2,8 +2,6 @@ package main
 
 import (
     "log"
-    "math/rand"
-    "time"
 )
 
 func importLogC() {
@@ -13,7 +11,7 @@ func importLogC() {
 const creatureCost int = 5
 const breedingCost int = 10
 const gestationPeriod int = 1 // 1 day breeding, 1 day gestation, 1 day birth
-const litterSize int = 5
+const litterSize int = 1
 const foodProduction int = 1
 const lumberProduction int = 1
 const housingProduction int = 1
@@ -124,11 +122,8 @@ func (creature *Creature) SpawnLitter(father *Creature) []*Creature {
 
 func (creature *Creature) Birth(father *Creature) *Creature {
     child := &Creature{Longevity:20, Age:0, Action: NOTHING}
-    rand.Seed(time.Now().Unix())
-    somethiing := rand.Intn(100)
-    log.Println("sigh at import", somethiing)
 
-    if somethiing > 50 {
+    if Random(0, 100) >= 50 {
         child.Sex = MALE
     } else {
         child.Sex = FEMALE
