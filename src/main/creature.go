@@ -8,13 +8,12 @@ func importLogC() {
     log.Println("sigh at import")
 }
 
-const creatureCost int = 5
-const breedingCost int = 10
+const creatureCost int = 3
+const breedingCost int = 4
 const gestationPeriod int = 1 // 1 day breeding, 1 day gestation, 1 day birth
 const litterSize int = 1
 const foodProduction int = 1
 const lumberProduction int = 1
-const housingProduction int = 1
 
 const (
     MALE = "Male"
@@ -31,20 +30,24 @@ const (
     SELL = "Sell"
 )
 
-type Creature struct {
-    ID int
-    Sex string
+type CreatureStats struct {
     Longevity int
-    Age int
     Agility int
     Strength int
     Intellect int
-    Action string
-    PartnerID int
-    Partner *Creature
-    GestationDay int
     LitterSize int
     EpiceneChance int
+}
+
+type Creature struct {
+    ID int
+    Sex string
+    Age int
+    Stats *CreatureStats
+    Action string
+    PartnerID int
+    PartnerStats *CreatureStats
+    GestationDay int
 }
 
 func (creature *Creature) Cost() int {
@@ -85,17 +88,16 @@ func (creature1 *Creature) CanBreedWith(creature2 *Creature) bool {
     return true
 }
 
-func (creature *Creature) Breed(partner *Creature) {
+func (creature *Creature) Breed(partner Creature) {
     if creature.Sex == MALE {
-        creature.Action = NOTHING
         creature.PartnerID = 0
         return
     }
 
-    creature.Partner = partner
+    creature.PartnerStats = partner.Stats
     creature.Action = PREGNANT
     creature.GestationDay = 1
-    creature.LitterSize = litterSize
+    creature.Stats.LitterSize = litterSize
 }
 
 func (creature *Creature) Gestate() {
@@ -107,21 +109,22 @@ func (creature *Creature) Gestate() {
     creature.Action = SPAWNING
 }
 
-func (creature *Creature) SpawnLitter(father *Creature) []*Creature {
+func (creature *Creature) SpawnLitter() []*Creature {
     creature.Action = NOTHING
     creature.PartnerID = 0
     creature.GestationDay = 0
     children := []*Creature{}
 
-    for i := 0 ; i < creature.LitterSize ; i += 1 {
-        children = append(children, creature.Birth(father))
+    for i := 0 ; i < creature.Stats.LitterSize ; i += 1 {
+        children = append(children, creature.Birth())
     }
 
     return children
 }
 
-func (creature *Creature) Birth(father *Creature) *Creature {
-    child := &Creature{Longevity:20, Age:0, Action: NOTHING}
+func (creature *Creature) Birth() *Creature {
+    fatherStats := creature.PartnerStats
+    child := &Creature{Age:0, Action: NOTHING, Stats:&CreatureStats{Longevity:20}}
 
     if Random(0, 100) >= 50 {
         child.Sex = MALE
@@ -129,38 +132,37 @@ func (creature *Creature) Birth(father *Creature) *Creature {
         child.Sex = FEMALE
     }
 
-    child.EpiceneChance = (creature.EpiceneChance + father.EpiceneChance) / 2 + Random(-1, 1)
-    if child.EpiceneChance > Random(0, 100) {
+    child.Stats.EpiceneChance = Max((creature.Stats.EpiceneChance + fatherStats.EpiceneChance) / 2 + Random(-1, 1), 5)
+    if child.Stats.EpiceneChance > Random(0, 100) {
         child.Sex = EPICENE
-        child.EpiceneChance += 1
+        child.Stats.EpiceneChance += 1
     }
+
+    child.Stats.Agility = Max((creature.Stats.Agility + fatherStats.Agility) / 2 + Random(-1, 1), 0)
+    child.Stats.Strength = Max((creature.Stats.Strength + fatherStats.Strength) / 2 + Random(-1, 1), 0)
+    child.Stats.Intellect = Max((creature.Stats.Intellect + fatherStats.Intellect) / 2 + Random(-1, 1), 0)
+
     return child
 }
 
 func (creature *Creature) ProduceFood() int {
-    foodProduced := creature.Agility * foodProduction
-    creature.Agility += 1
+    foodProduced := creature.Stats.Agility * foodProduction
+    creature.Stats.Agility += 1
     return foodProduced
 }
 
 func (creature *Creature) ProduceLumber() int {
-    lumberProduced := creature.Strength * lumberProduction
-    creature.Strength += 1
+    lumberProduced := creature.Stats.Strength * lumberProduction
+    creature.Stats.Strength += 1
     return lumberProduced
 }
 
-func (creature *Creature) ProducibleHousing() int {
-    return creature.Intellect * housingProduction
-}
-
-func (creature *Creature) ProduceHousing() int {
-    housingProduced := creature.Intellect * housingProduction
-    creature.Intellect += 1
-    return housingProduced
+func (creature *Creature) ProduceHousing() {
+    creature.Stats.Intellect += 1
 }
 
 func (creature *Creature) SetAction(action string) string {
-    if creature.Action != PREGNANT {
+    if creature.Action != PREGNANT && creature.Action != SPAWNING{
         creature.Action = action
     }
 

@@ -52,7 +52,7 @@ func endDay(w http.ResponseWriter, req *http.Request) {
     // log.Println("End of Day")
     session := getParam(req, "Session", 0)
     newDay := EndDay(session)
-    if newDay.Play.Food < 0 {
+    if newDay.Play.Food < 0 || len(newDay.Play.Creatures) == 0 {
         err := templates["start"].Execute(w, NewPlaySession(session))
         if err != nil { log.Panic(err) }
     } else {
