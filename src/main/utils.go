@@ -12,7 +12,8 @@ func InitUtils() {
 }
 
 func Random(min int, max int) int {
-    return rand.Intn(max - min) + min
+    // including the max value
+    return rand.Intn(max + 1 - min) + min
 }
 
 func Clamp(value int, min int, max int) int {
