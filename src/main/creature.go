@@ -136,6 +136,7 @@ func (creature *Creature) Birth() *Creature {
     if child.Stats.EpiceneChance > Random(0, 100) {
         child.Sex = EPICENE
         child.Stats.EpiceneChance += 1
+        if child.Stats.EpiceneChance > 98 { child.Stats.EpiceneChance = 98 }
     }
 
     child.Stats.Agility = Max((creature.Stats.Agility + fatherStats.Agility) / 2 + Random(-1, 1), 0)
