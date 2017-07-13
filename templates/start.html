@@ -12,55 +12,158 @@
         }
         .table {
             border-spacing: 0px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 750px;
         }
-        .table>thead>tr>th {
+        .verticalText {
             vertical-align: middle;
-            text-align: center;
+            display: inline-block;
+            white-space: nowrap;
+            transform: rotate(-90deg) translate(-50%, -50%);
+            transform-origin:0 0;
+            position: absolute;
         }
-        .table>tbody>tr>td {
+        tr {
+            height: 45px;
+        }
+        tr>td {
+            width: 150px;
             vertical-align: middle;
             text-align: center;
             border-top: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        tr>td:first-child {
+            border-left: 1px solid #ddd;
+        }
+        tr>.small {
+            width: 30px;
+        }
+        thead>tr {
+            position: relative;
+            display: block;
+            height: 113px;
+        }
+        thead>tr>td {
+            height: 110px;
+            border-bottom: 1px solid #ddd;
+        }
+        .scroller-y {
+            display: block;
+            overflow-y: scroll;
+            height: 100%;
+            width: 923px;
+        }
+        .resources {
+            width: 923px;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 24px;
+            background-color: grey;
+            white-space: nowrap;
+        }
+        .resources>span {
+            display: inline-block;
+            width: 33%;
+        }
+        .end-day-button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            height: 40px;
+            text-align: center;
+        }
+        .end-day-button>a {
+            background-color: grey;
+            color: blue;
+            text-decoration: none;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 30px;
+        }
+        .end-day-button>:hover {
+            background-color: LightGrey;
+            color: black;
+        }
+        .actionshead {
+            width: 415px;
+        }
+        .actions {
+            width: 400px;
+        }
+        .wrapper {
+            height: 100%;
+        }
+        @media (max-width: 1920px) {
+            .table {
+                height: 750px;
+            }
+        }
+        @media (max-width: 1440px) {
+            .table {
+                height: 600px;
+            }
+        }
+        @media (max-width: 1280px) {
+            .table {
+                height: 550px;
+            }
+        }
+        @media (max-width: 960px) {
+            body {
+                margin: 0;
+            }
+            .table {
+                height: 390px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>My session: {{$session := .Session}}</h1>
-    <h1>Current Day: {{.Day}}</h1>
-    <h1>Resources Food: {{.Play.Food}}, Lumber: {{.Play.Lumber}}, Housing Cost: {{.Play.Housing}}</h1>
-    <h1>Current Creatures Cost: {{.Play.CreaturesCost}}</h1>
-    <h1>Creatures: {{len .Play.Creatures}}/{{.Play.Housing}}</h1>
-    <div style="width:100%;"><a href="/endDay?Session={{.Session}}" style="margin-left:auto; margin-right:auto; font-size: 30px;">End Day</a></div>
-    <h1>Current Play:</h1>
-    <div style="height: 50%; overflow-y: scroll">
-        <table class="table">
-            <thead>
+    {{$session := .Session}}
+    <div class="resources">
+        <span>My session: {{$session}}</span>
+    </div>
+    <div class="resources">
+        <span>Food: {{.Play.Food}}</span>
+        <span>Lumber: {{.Play.Lumber}}</span>
+        <span>Housing Cost: {{.Play.Housing}}</span>
+    </div>
+    <div class="resources">
+        <span>Creatures: {{len .Play.Creatures}}/{{.Play.Housing}}</span>
+        <span>Creatures Cost: {{.Play.CreaturesCost}}</span>
+        <span>Current Day: {{.Day}}</span>
+    </div>
+    <div class="end-day-button"><a href="/endDay?Session={{.Session}}">End Day</a></div>
+    <table class="table">
+        <thead class="tableheader">
             <tr>
-                <th style="width: 100px">Sex</th>
-                <th style="width: 50px">Age</th>
-                <th style="width: 80px">Longevity</th>
-                <th style="width: 70px">Agility</th>
-                <th style="width: 70px">Strength</th>
-                <th style="width: 70px">Intellect</th>
-                <th style="width: 120px">Epicene Chance</th>
-                <th style="width: 200px; padding-left: 10px;">Current Action</th>
-                <th style="width: 50%">Possible Actions</th>
+                <td>Sex</td>
+                <td class="small"><div class="verticalText">Age</div></td>
+                <td class="small"><div class="verticalText">Longevity</div></td>
+                <td class="small"><div class="verticalText">Farming</div></td>
+                <td class="small"><div class="verticalText">Lumberjacking</div></td>
+                <td class="small"><div class="verticalText">Constructing</div></td>
+                <td class="small"><div class="verticalText">Epicene Chance</div></td>
+                <td>Current Action</td>
+                <td class="actionshead">Possible Actions</td>
             </tr>
-            </thead>
-            <tbody>
+        </thead>
+        <tbody class="scroller-y">
             {{ range $key, $creature := .Play.Creatures }}
-            <tr id="creature_{{$creature.ID}}" style="height: 45px">
+            <tr id="creature_{{$creature.ID}}">
                 <td>{{$creature.Sex}}</td>
-                <td>{{$creature.Age}}</td>
-                <td>{{$creature.Stats.Longevity}}</td>
-                <td>{{$creature.Stats.Agility}}</td>
-                <td>{{$creature.Stats.Strength}}</td>
-                <td>{{$creature.Stats.Intellect}}</td>
-                <td>{{$creature.Stats.EpiceneChance}}</td>
+                <td class="small">{{$creature.Age}}</td>
+                <td class="small">{{$creature.Stats.Longevity}}</td>
+                <td class="small">{{$creature.Stats.Agility}}</td>
+                <td class="small">{{$creature.Stats.Strength}}</td>
+                <td class="small">{{$creature.Stats.Intellect}}</td>
+                <td class="small">{{$creature.Stats.EpiceneChance}}</td>
                 <td>
                     <span id="creature_action_{{$creature.ID}}">{{$creature.Action}}</span>
                 </td>
-                <td>
+                <td class="actions">
                     {{ if gt $creature.Age 2 }}
                     <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Nothing')"/>
                     <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Breeding')"/>
@@ -72,8 +175,7 @@
                 </td>
             </tr>
             {{ end }}
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
 </body>
 </html>
