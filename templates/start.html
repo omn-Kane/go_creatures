@@ -5,121 +5,7 @@
     <title>Start</title>
     <script src="/public/scripts/jquery.min.js"></script>
     <script src="/public/scripts/posts.js"></script>
-    <style>
-        ul {
-            padding: 0;
-            list-style-type: none;
-        }
-        .table {
-            border-spacing: 0px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 750px;
-        }
-        .verticalText {
-            vertical-align: middle;
-            display: inline-block;
-            white-space: nowrap;
-            transform: rotate(-90deg) translate(-50%, -50%);
-            transform-origin:0 0;
-            position: absolute;
-        }
-        tr {
-            height: 45px;
-        }
-        tr>td {
-            width: 150px;
-            vertical-align: middle;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-        }
-        tr>td:first-child {
-            border-left: 1px solid #ddd;
-        }
-        tr>.small {
-            width: 30px;
-        }
-        thead>tr {
-            position: relative;
-            display: block;
-            height: 113px;
-        }
-        thead>tr>td {
-            height: 110px;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-        }
-        .scroller-y {
-            display: block;
-            overflow-y: scroll;
-            height: 100%;
-            width: 923px;
-        }
-        .resources {
-            width: 923px;
-            height: 30px;
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 24px;
-            background-color: grey;
-            white-space: nowrap;
-        }
-        .resources>span {
-            display: inline-block;
-            width: 33%;
-        }
-        .end-day-button {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            height: 40px;
-            text-align: center;
-        }
-        .end-day-button>a {
-            background-color: grey;
-            color: blue;
-            text-decoration: none;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 30px;
-        }
-        .end-day-button>:hover {
-            background-color: LightGrey;
-            color: black;
-        }
-        .actionshead {
-            width: 415px;
-        }
-        .actions {
-            width: 400px;
-        }
-        .wrapper {
-            height: 100%;
-        }
-        @media (max-width: 1920px) {
-            .table {
-                height: 750px;
-            }
-        }
-        @media (max-width: 1440px) {
-            .table {
-                height: 600px;
-            }
-        }
-        @media (max-width: 1280px) {
-            .table {
-                height: 550px;
-            }
-        }
-        @media (max-width: 960px) {
-            body {
-                margin: 0;
-            }
-            .table {
-                height: 390px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
 </head>
 <body>
     {{$session := .Session}}
@@ -147,6 +33,7 @@
                 <td class="small"><div class="verticalText">Lumberjacking</div></td>
                 <td class="small"><div class="verticalText">Constructing</div></td>
                 <td class="small"><div class="verticalText">Epicene Chance</div></td>
+                <td class="small"><div class="verticalText">Multi Birth Chance</div></td>
                 <td>Current Action</td>
                 <td class="actionshead">Possible Actions</td>
             </tr>
@@ -155,17 +42,18 @@
             {{ range $key, $creature := .Play.Creatures }}
             <tr id="creature_{{$creature.ID}}">
                 <td>{{$creature.Sex}}</td>
-                <td class="small">{{$creature.Age}}</td>
+                <td class="small">{{$creature.Stats.Age}}</td>
                 <td class="small">{{$creature.Stats.Longevity}}</td>
                 <td class="small">{{$creature.Stats.Agility}}</td>
                 <td class="small">{{$creature.Stats.Strength}}</td>
                 <td class="small">{{$creature.Stats.Intellect}}</td>
                 <td class="small">{{$creature.Stats.EpiceneChance}}</td>
+                <td class="small">{{$creature.Stats.MultiBirthChance}}</td>
                 <td>
                     <span id="creature_action_{{$creature.ID}}">{{$creature.Action}}</span>
                 </td>
                 <td class="actions">
-                    {{ if gt $creature.Age 2 }}
+                    {{ if gt $creature.Stats.Age 2 }}
                     <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Nothing')"/>
                     <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Breeding')"/>
                     <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Farming')"/>

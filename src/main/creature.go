@@ -8,7 +8,7 @@ func importLogC() {
     log.Println("sigh at import")
 }
 
-const creatureCost int = 3
+const creatureCost int = 1
 const breedingCost int = 4
 const gestationPeriod int = 1 // 1 day breeding, 1 day gestation, 1 day birth
 const litterSize int = 1
@@ -31,18 +31,19 @@ const (
 )
 
 type CreatureStats struct {
+    Age int
     Longevity int
     Agility int
     Strength int
     Intellect int
     LitterSize int
     EpiceneChance int
+    MultiBirthChance int
 }
 
 type Creature struct {
     ID int
     Sex string
-    Age int
     Stats *CreatureStats
     Action string
     PartnerID int
@@ -52,9 +53,9 @@ type Creature struct {
 
 func (creature *Creature) Cost() int {
     if creature.Action == PREGNANT {
-        return creature.Age * creatureCost + creature.GestationDay * breedingCost
+        return creature.Stats.Age * creature.Stats.Age * creatureCost + creature.GestationDay * breedingCost
     } else {
-        return creature.Age * creatureCost
+        return creature.Stats.Age * creature.Stats.Age * creatureCost
     }
 }
 
@@ -115,7 +116,10 @@ func (creature *Creature) SpawnLitter() []*Creature {
     creature.GestationDay = 0
     children := []*Creature{}
 
-    for i := 0 ; i < creature.Stats.LitterSize ; i += 1 {
+    for i := 0 ; i < creature.Stats.LitterSize / 100 ; i += 1 {
+        children = append(children, creature.Birth())
+    }
+    if Random(0, 100) > creature.Stats.LitterSize % 100 {
         children = append(children, creature.Birth())
     }
 
@@ -124,7 +128,7 @@ func (creature *Creature) SpawnLitter() []*Creature {
 
 func (creature *Creature) Birth() *Creature {
     fatherStats := creature.PartnerStats
-    child := &Creature{Age:0, Action: NOTHING, Stats:&CreatureStats{Longevity:20}}
+    child := &Creature{Action: NOTHING, Stats:&CreatureStats{Age:0}}
 
     if Random(0, 100) >= 50 {
         child.Sex = MALE
@@ -142,6 +146,11 @@ func (creature *Creature) Birth() *Creature {
     child.Stats.Agility = Max((creature.Stats.Agility + fatherStats.Agility) / 2 + Random(-1, 1), 0)
     child.Stats.Strength = Max((creature.Stats.Strength + fatherStats.Strength) / 2 + Random(-1, 1), 0)
     child.Stats.Intellect = Max((creature.Stats.Intellect + fatherStats.Intellect) / 2 + Random(-1, 1), 0)
+    child.Stats.MultiBirthChance = Max((creature.Stats.MultiBirthChance + fatherStats.MultiBirthChance) / 2 + Random(-1, 1), 100)
+
+    longevityMother := (creature.Stats.Longevity + creature.Stats.Age) / 2 + 2
+    longevityFather := (fatherStats.Longevity + fatherStats.Age) / 2 + 2
+    child.Stats.Longevity = Max((longevityFather + longevityMother) / 2 + Random(-1, 1), 15)
 
     return child
 }

@@ -6,7 +6,7 @@ import (
     "net/http"
     "strconv"
     // "strings"
-    // "encoding/json"
+    "encoding/json"
     "io/ioutil"
     "html/template"
     "log"
@@ -50,14 +50,29 @@ func start(w http.ResponseWriter, req *http.Request) {
 
 func endDay(w http.ResponseWriter, req *http.Request) {
     // log.Println("End of Day")
+    var err error
+    asJson, boolParseErr := strconv.ParseBool(getParam(req, "json", 0))
+
     session := getParam(req, "Session", 0)
     newDay := EndDay(session)
     if newDay.Play.Food < 0 || len(newDay.Play.Creatures) == 0 {
-        err := templates["start"].Execute(w, NewPlaySession(session))
-        if err != nil { log.Panic(err) }
+        if boolParseErr == nil && asJson {
+            theJson, errJson := json.Marshal(NewPlaySession(session))
+            if errJson != nil { log.Panic(errJson) }
+            fmt.Fprintf(w, string(theJson))
+        } else {
+            err = templates["start"].Execute(w, NewPlaySession(session))
+            if err != nil { log.Panic(err) }
+        }
     } else {
-        err := templates["start"].Execute(w, newDay)
-        if err != nil { log.Panic(err) }
+        if boolParseErr == nil && asJson {
+            theJson, errJson := json.Marshal(newDay)
+            if errJson != nil { log.Panic(errJson) }
+            fmt.Fprintf(w, string(theJson))
+        } else {
+            err = templates["start"].Execute(w, newDay)
+            if err != nil { log.Panic(err) }
+        }
     }
 }
 
@@ -96,7 +111,11 @@ func getParam(req *http.Request, key string, value int) string {
     req.ParseForm()
     object, err := url.ParseQuery(req.URL.RawQuery)
     if err != nil { log.Panic(err) }
-    return object[key][value]
+    obj, foundKey := object[key]
+    if foundKey {
+        return obj[value]
+    }
+    return ""
 }
 
 

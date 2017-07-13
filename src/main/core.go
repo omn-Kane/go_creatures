@@ -25,9 +25,9 @@ var sessions map[string] *Context
 
 var sessionValueLength = 16
 var adultAge = 3
-var startingFood = 5000
+var startingFood = 10000
 var startingLumber = 0
-var startingHousing = 4
+var startingHousing = 10
 var letterRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 
@@ -49,8 +49,8 @@ func NewPlaySession(session string) Context {
     }
 
     creatures := make(map[int] *Creature)
-    creatures[1] = &Creature{ID:1, Sex:MALE, Age:3, Stats:&CreatureStats{Longevity:20, EpiceneChance: 5}, Action: NOTHING}
-    creatures[2] = &Creature{ID:2, Sex:FEMALE, Age:3, Stats:&CreatureStats{Longevity:20, EpiceneChance: 5}, Action: NOTHING}
+    creatures[1] = &Creature{ID:1, Sex:MALE, Stats:&CreatureStats{Age:3, Longevity:15, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
+    creatures[2] = &Creature{ID:2, Sex:FEMALE, Stats:&CreatureStats{Age:3, Longevity:15, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
 
     playDict := PlayDict{startingFood, startingLumber, startingHousing, creatures, 0, 2}
     playDict.SetTotalCost()
@@ -123,7 +123,7 @@ func (playDict *PlayDict) SetTotalCost() {
 func (playDict *PlayDict) SellCreatures() {
     for _, creature := range playDict.Creatures {
         if creature.Action == SELL {
-            playDict.Food += creature.ProduceFood() * (creature.Stats.Longevity - creature.Age)
+            playDict.Food += creature.ProduceFood() * (creature.Stats.Longevity - creature.Stats.Age)
             delete(playDict.Creatures, creature.ID)
         }
     }
@@ -131,7 +131,7 @@ func (playDict *PlayDict) SellCreatures() {
 
 func (playDict *PlayDict) WorkCreatures() {
     for _, creature := range playDict.Creatures {
-        if creature.Action == FARMING || creature.Action == NOTHING && creature.Age > adultAge{
+        if creature.Action == FARMING || creature.Action == NOTHING && creature.Stats.Age > adultAge{
             playDict.Food += creature.ProduceFood()
             continue
         }
@@ -187,8 +187,8 @@ func (playDict *PlayDict) BirthCreatures() {
 
 func (playDict *PlayDict) AgeCreatures() {
     for _, creature := range playDict.Creatures {
-        creature.Age += 1
-        if creature.Age > creature.Stats.Longevity {
+        creature.Stats.Age += 1
+        if creature.Stats.Age > creature.Stats.Longevity {
             delete(playDict.Creatures, creature.ID)
         }
     }
