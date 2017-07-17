@@ -63,7 +63,7 @@ func NewPlaySession(session string) Context {
 }
 
 func SearchDatabase(session string) Context {
-    currentSession := GetRecord(session)
+    currentSession := GetRecord(session, 0)
     if currentSession.Session == "" { return NewPlaySession(session) }
     sessions[currentSession.Session] = &currentSession
     return currentSession

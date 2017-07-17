@@ -35,11 +35,32 @@ func (c *Context) InsertRecord() {
     if err != nil { log.Panic(err) }
 }
 
-func GetRecord(session string) Context {
+func GetRecord(session string, day int) Context {
+    if day == 0 {
+        return GetRecordWithSession(session)
+    } else {
+        return GetRecordWithSessionAndDay(session, day)
+    }
+}
+
+func GetRecordWithSession(session string) Context {
     record := &Context{}
     var tempPlay []byte
 
     err = db.QueryRow("SELECT * FROM playsessions WHERE session=? ORDER BY day DESC LIMIT 1", session).Scan(&record.Session, &record.Day, &tempPlay)
+    if err != nil { return Context{} }
+
+    err = json.Unmarshal(tempPlay, &record.Play)
+    if err != nil { log.Panic(err) }
+
+    return *record
+}
+
+func GetRecordWithSessionAndDay(session string, day int) Context {
+    record := &Context{}
+    var tempPlay []byte
+
+    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? AND day=? LIMIT 1", session, day).Scan(&record.Session, &record.Day, &tempPlay)
     if err != nil { return Context{} }
 
     err = json.Unmarshal(tempPlay, &record.Play)

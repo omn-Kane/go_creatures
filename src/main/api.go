@@ -11,6 +11,8 @@ import (
     "html/template"
     "log"
     // "reflect"
+
+    "github.com/graphql-go/handler"
 )
 
 var host string = ""
@@ -27,6 +29,10 @@ func main() {
 
     fs := http.FileServer(http.Dir(""))
     http.Handle("/", fs)
+
+    graphqlHandler := handler.New(&handler.Config{Schema: &Schema, Pretty: true})
+    http.Handle("/graphql", graphqlHandler)
+
     http.HandleFunc("/start/", start)
     http.HandleFunc("/endDay", endDay)
     http.HandleFunc("/breedWith", breedWith)
