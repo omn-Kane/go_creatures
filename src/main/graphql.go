@@ -5,6 +5,9 @@ import (
     "github.com/graphql-go/graphql"
 )
 
+func importGraphQLLog() {
+    log.Println("sigh at import")
+}
 
 var statsType = graphql.NewObject(graphql.ObjectConfig{
     Name: "Stats",
