@@ -123,13 +123,10 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
                 },
             },
             Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-                log.Println("WTT", p.Args["Session"], p.Args["Day"])
                 session, hasSession := p.Args["Session"]
                 if hasSession {
-                    log.Println("WTT", p.Args["Session"])
                     day, hasDay := p.Args["Day"]
-                    if hasDay {
-                        log.Println("WTT", p.Args["Day"])
+                    if hasDay && day != 0 {
                         return GetRecordWithSessionAndDay(session.(string), day.(int)), nil
                     } else {
                         return GetRecordWithSession(session.(string)), nil

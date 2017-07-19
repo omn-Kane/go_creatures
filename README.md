@@ -6,4 +6,5 @@
 - Go to `http://${DNS}:8080/start/` to start a new session
 
 
-curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query Root{ Context(Session:"BpLnfgDsc2WD8F2q" Day:232){ Session Day Play{Food Lumber Housing Creatures{ ID Sex Stats{ Age Agility } } } } }'
+### GraphQL query:
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:393){ Session Day Play{Food Lumber Housing Creatures{ ID Sex Stats{ Age Agility } } } } }'
