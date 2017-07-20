@@ -3,10 +3,21 @@ package main
 import (
     "log"
     "github.com/graphql-go/graphql"
+    "sort"
 )
 
 func importGraphQLLog() {
     log.Println("sigh at import")
+}
+type ByID []*Creature
+func (s ByID) Len() int {
+    return len(s)
+}
+func (s ByID) Swap(i, j int) {
+    s[i], s[j] = s[j], s[i]
+}
+func (s ByID) Less(i, j int) bool {
+    return s[i].ID < s[j].ID
 }
 
 var statsType = graphql.NewObject(graphql.ObjectConfig{
@@ -78,12 +89,40 @@ var playType = graphql.NewObject(graphql.ObjectConfig{
         "Housing": &graphql.Field{
             Type: graphql.Int,
         },
+        "CreatureCount": &graphql.Field{
+            Type: graphql.Int,
+            Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+                return len(p.Source.(PlayDict).Creatures), nil
+            },
+        },
         "Creatures": &graphql.Field{
             Type: graphql.NewList(creatureType),
+            Args: graphql.FieldConfigArgument{
+                "Offset": &graphql.ArgumentConfig{
+                    Type: graphql.Int,
+                },
+                "Limit": &graphql.ArgumentConfig{
+                    Type: graphql.Int,
+                },
+            },
             Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+                offset, hasOffset := p.Args["Offset"]
+                limit, hasLimit := p.Args["Limit"]
+
                 var creatures []*Creature
                 for _, creature := range p.Source.(PlayDict).Creatures {
                     creatures = append(creatures, creature)
+                }
+                sort.Sort(ByID(creatures))
+                length := len(creatures)
+
+                if hasOffset && hasLimit {
+                    intLimit := offset.(int) + limit.(int)
+                    if length < intLimit {
+                        creatures = creatures[offset.(int):length]
+                    } else {
+                        creatures = creatures[offset.(int):intLimit]
+                    }
                 }
                 return creatures, nil
             },

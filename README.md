@@ -7,4 +7,8 @@
 
 
 ### GraphQL query:
-curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:393){ Session Day Play{Food Lumber Housing Creatures{ ID Sex Stats{ Age Agility } } } } }'
+- `http://graphql.org/learn/queries/`
+- `curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:0){ Session Day Play{Food Lumber Housing CreatureCount Creatures{ ID Sex Stats{ Age Agility } } } } }'`
+
+
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:0){ Session Day Play{Food Lumber Housing CreatureCount Creatures(Offset: 10, Limit: 10){ ID Sex Stats{ Age Agility } } } } }'
