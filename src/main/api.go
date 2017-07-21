@@ -26,6 +26,7 @@ func main() {
 
     InitSessions()
     InitDatabases()
+    InitUtils()
 
     fs := http.FileServer(http.Dir(""))
     http.Handle("/", fs)

@@ -14,6 +14,13 @@ CREATE TABLE IF NOT EXISTS playsessions (
     play VARCHAR,
     UNIQUE(session, day) ON CONFLICT REPLACE
 );
+
+CREATE TABLE IF NOT EXISTS creatures (
+    session VARCHAR,
+    day INTEGER,
+    creatures VARCHAR,
+    UNIQUE(session, day) ON CONFLICT REPLACE
+);
 `
 
 var db *sql.DB
@@ -30,6 +37,7 @@ func InitDatabases() {
 func (c *Context) InsertRecord() {
     playString, errJson := json.Marshal(c.Play)
     if errJson != nil { log.Panic(errJson) }
+    // log.Println(string(playString))
 
     _, err = db.Exec("REPLACE INTO playsessions (session, day, play) VALUES ($1, $2, $3)", c.Session, c.Day, playString)
     if err != nil { log.Panic(err) }
@@ -67,4 +75,28 @@ func GetRecordWithSessionAndDay(session string, day int) Context {
     if err != nil { log.Panic(err) }
 
     return *record
+}
+
+func (c *Context) InsertCreatures() {
+    creaturesString, errJson := json.Marshal(c.Play.Creatures)
+    if errJson != nil { log.Panic(errJson) }
+    // log.Println(string(creaturesString))
+
+    _, err = db.Exec("REPLACE INTO creatures (session, day, creatures) VALUES ($1, $2, $3)", c.Session, c.Day, creaturesString)
+    if err != nil { log.Panic(err) }
+}
+
+func GetCreatures(session string, day int) map[int] *Creature {
+    // log.Println(session, day)
+    var record map[int] *Creature
+    var byteArray []byte
+
+    err = db.QueryRow("SELECT creatures FROM creatures WHERE session=? AND day=? LIMIT 1", session, day).Scan(&byteArray)
+    // log.Println(string(byteArray), err)
+    if err != nil { return record }
+
+    err = json.Unmarshal(byteArray, &record)
+    if err != nil { log.Panic(err) }
+
+    return record
 }

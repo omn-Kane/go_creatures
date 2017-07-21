@@ -10,7 +10,7 @@ type PlayDict struct {
     Food int
     Lumber int
     Housing int
-    Creatures map[int] *Creature
+    Creatures map[int] *Creature `json:"-"`
     CreaturesCost int
     MaxCreatureID int
 }
@@ -58,6 +58,7 @@ func NewPlaySession(session string) Context {
     context := Context{session, 0, playDict}
     sessions[context.Session] = &context
     context.InsertRecord()
+    context.InsertCreatures()
     // log.Println("NewSession", session.play);
     return context
 }
@@ -76,6 +77,7 @@ func EndDay(session string) Context {
 
     currentSession.CompleteDay()
     currentSession.InsertRecord()
+    currentSession.InsertCreatures()
 
     return *currentSession
 }

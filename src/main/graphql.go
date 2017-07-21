@@ -9,6 +9,7 @@ import (
 func importGraphQLLog() {
     log.Println("sigh at import")
 }
+
 type ByID []*Creature
 func (s ByID) Len() int {
     return len(s)
@@ -18,6 +19,37 @@ func (s ByID) Swap(i, j int) {
 }
 func (s ByID) Less(i, j int) bool {
     return s[i].ID < s[j].ID
+}
+
+func creatureResolver(p graphql.ResolveParams) (interface{}, error) {
+    session, hasSession := p.Args["Session"]
+    day, hasDay := p.Args["Day"]
+    offset, hasOffset := p.Args["Offset"]
+    limit, hasLimit := p.Args["Limit"]
+
+    var creatures []*Creature
+    if hasSession && hasDay {
+        creaturesMap := GetCreatures(session.(string), day.(int))
+        for _, creature := range creaturesMap {
+            creatures = append(creatures, creature)
+        }
+
+        sort.Sort(ByID(creatures))
+        length := len(creatures)
+        if hasOffset && hasLimit && length > 0 {
+            intOffset := offset.(int)
+            intLimit := intOffset + limit.(int)
+            if length < intLimit {
+                if length > intOffset {
+                    creatures = creatures[offset.(int):length]
+                }
+            } else {
+                creatures = creatures[offset.(int):intLimit]
+            }
+        }
+    }
+
+    return creatures, nil
 }
 
 var statsType = graphql.NewObject(graphql.ObjectConfig{
@@ -105,27 +137,7 @@ var playType = graphql.NewObject(graphql.ObjectConfig{
                     Type: graphql.Int,
                 },
             },
-            Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-                offset, hasOffset := p.Args["Offset"]
-                limit, hasLimit := p.Args["Limit"]
-
-                var creatures []*Creature
-                for _, creature := range p.Source.(PlayDict).Creatures {
-                    creatures = append(creatures, creature)
-                }
-                sort.Sort(ByID(creatures))
-                length := len(creatures)
-
-                if hasOffset && hasLimit {
-                    intLimit := offset.(int) + limit.(int)
-                    if length < intLimit {
-                        creatures = creatures[offset.(int):length]
-                    } else {
-                        creatures = creatures[offset.(int):intLimit]
-                    }
-                }
-                return creatures, nil
-            },
+            Resolve: creatureResolver,
         },
         "CreaturesCost": &graphql.Field{
             Type: graphql.Int,
@@ -176,6 +188,24 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
                 }
                 return contextType, nil
             },
+        },
+        "Creatures": &graphql.Field{
+            Type: graphql.NewList(creatureType),
+            Args: graphql.FieldConfigArgument{
+                "Session": &graphql.ArgumentConfig{
+                    Type: graphql.String,
+                },
+                "Day": &graphql.ArgumentConfig{
+                    Type: graphql.Int,
+                },
+                "Offset": &graphql.ArgumentConfig{
+                    Type: graphql.Int,
+                },
+                "Limit": &graphql.ArgumentConfig{
+                    Type: graphql.Int,
+                },
+            },
+            Resolve: creatureResolver,
         },
     },
 })
