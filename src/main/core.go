@@ -25,7 +25,7 @@ var sessions map[string] *Context
 
 var sessionValueLength = 16
 var adultAge = 3
-var startingFood = 10000
+var startingFood = 20000
 var startingLumber = 0
 var startingHousing = 10
 var letterRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -88,7 +88,7 @@ func EndDay(session string) Context {
     currentSession.InsertCreatures()
 
     if currentSession.Play.Food < 0 || len(currentSession.Play.Creatures) == 0 {
-        return NewPlaySession(session)
+        return NewPlaySession("")
     } else {
         return *currentSession
     }
@@ -128,8 +128,8 @@ func (session *Context) CompleteDay() {
     session.Play.BirthCreatures()
     session.Play.GestateCreatures()
     session.Play.PartnerBreedingCreatures()
-    session.Play.BreedCreatures()
     session.Play.WorkCreatures()
+    session.Play.BreedCreatures()
     session.Play.AgeCreatures()
     session.Play.SetTotalCost()
 }
@@ -160,9 +160,8 @@ func (playDict *PlayDict) WorkCreatures() {
             continue
         }
         if creature.Action == CONSTRUCTING {
-            housingCost := playDict.Housing - creature.Stats.Intellect
+            housingCost := playDict.Housing * playDict.Housing
             if housingCost < playDict.Lumber {
-                creature.ProduceHousing()
                 playDict.Housing += 1
                 playDict.Lumber -= housingCost
             }

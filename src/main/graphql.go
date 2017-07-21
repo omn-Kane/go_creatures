@@ -57,9 +57,8 @@ var statsType = graphql.NewObject(graphql.ObjectConfig{
     Fields: graphql.Fields{
         "Age": &graphql.Field{Type: graphql.Int},
         "Longevity": &graphql.Field{Type: graphql.Int},
-        "Agility": &graphql.Field{Type: graphql.Int},
-        "Strength": &graphql.Field{Type: graphql.Int},
-        "Intellect": &graphql.Field{Type: graphql.Int},
+        "Farming": &graphql.Field{Type: graphql.Int},
+        "Lumberjacking": &graphql.Field{Type: graphql.Int},
         "LitterSize": &graphql.Field{Type: graphql.Int},
         "EpiceneChance": &graphql.Field{Type: graphql.Int},
         "MultiBirthChance": &graphql.Field{Type: graphql.Int},
@@ -128,7 +127,7 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
                 if hasSession && hasDay {
                     return GetSession(session.(string), day.(int)), nil
                 }
-                return contextType, nil
+                return NewPlaySession(""), nil
             },
         },
         "Creatures": &graphql.Field{

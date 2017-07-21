@@ -33,9 +33,8 @@ const (
 type CreatureStats struct {
     Age int
     Longevity int
-    Agility int
-    Strength int
-    Intellect int
+    Farming int
+    Lumberjacking int
     LitterSize int
     EpiceneChance int
     MultiBirthChance int
@@ -143,9 +142,8 @@ func (creature *Creature) Birth() *Creature {
         if child.Stats.EpiceneChance > 98 { child.Stats.EpiceneChance = 98 }
     }
 
-    child.Stats.Agility = Max((creature.Stats.Agility + fatherStats.Agility) / 2 + Random(-1, 1), 0)
-    child.Stats.Strength = Max((creature.Stats.Strength + fatherStats.Strength) / 2 + Random(-1, 1), 0)
-    child.Stats.Intellect = Max((creature.Stats.Intellect + fatherStats.Intellect) / 2 + Random(-1, 1), 0)
+    child.Stats.Farming = Max((creature.Stats.Farming + fatherStats.Farming) / 2 + Random(-1, 1), 0)
+    child.Stats.Lumberjacking = Max((creature.Stats.Lumberjacking + fatherStats.Lumberjacking) / 2 + Random(-1, 1), 0)
     child.Stats.MultiBirthChance = Max((creature.Stats.MultiBirthChance + fatherStats.MultiBirthChance) / 2 + Random(-1, 1), 100)
 
     longevityMother := (creature.Stats.Longevity + creature.Stats.Age) / 2 + 2
@@ -156,19 +154,15 @@ func (creature *Creature) Birth() *Creature {
 }
 
 func (creature *Creature) ProduceFood() int {
-    foodProduced := creature.Stats.Agility * foodProduction
-    creature.Stats.Agility += 1
+    foodProduced := creature.Stats.Farming * foodProduction
+    creature.Stats.Farming += 1
     return foodProduced
 }
 
 func (creature *Creature) ProduceLumber() int {
-    lumberProduced := creature.Stats.Strength * lumberProduction
-    creature.Stats.Strength += 1
+    lumberProduced := creature.Stats.Lumberjacking * lumberProduction
+    creature.Stats.Lumberjacking += 1
     return lumberProduced
-}
-
-func (creature *Creature) ProduceHousing() {
-    creature.Stats.Intellect += 1
 }
 
 func (creature *Creature) SetAction(action string) string {
