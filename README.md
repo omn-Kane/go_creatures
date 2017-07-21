@@ -8,10 +8,10 @@
 
 ### GraphQL query:
 - `http://graphql.org/learn/queries/`
-- `curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:0){ Session Day Play{Food Lumber Housing CreatureCount Creatures{ ID Sex Stats{ Age Agility } } } } }'`
+- `curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Season:0){ Session Season Play{Food Lumber Housing CreatureCount Creatures{ ID Sex Stats{ Age Agility } } } } }'`
 
 
-curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Day:0){ Session Day Play{Food Lumber Housing CreatureCount Creatures(Offset: 10, Limit: 10){ ID Sex Stats{ Age Agility } } } } }'
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Context(Session:"BpLnfgDsc2WD8F2q" Season:0){ Session Season Play{Food Lumber Housing CreatureCount Creatures(Offset: 10, Limit: 10){ ID Sex Stats{ Age Agility } } } } }'
 
-curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Creatures(Session:"YyXOqB8QhMqEm2Pz", Day:20, Offset: 10, Limit: 10) { ID Sex Stats{ Age Agility } } }'
-curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'mutation { EndDay(Session:"YyXOqB8QhMqEm2Pz") { Session Day } }'
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Creatures(Session:"YyXOqB8QhMqEm2Pz", Season:20, Offset: 10, Limit: 10) { ID Sex Stats{ Age Agility } } }'
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'mutation { EndSeason(Session:"YyXOqB8QhMqEm2Pz") { Session Season } }'

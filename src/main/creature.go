@@ -10,7 +10,7 @@ func importLogC() {
 
 const creatureCost int = 1
 const breedingCost int = 4
-const gestationPeriod int = 1 // 1 day breeding, 1 day gestation, 1 day birth
+const gestationPeriod int = 3 // 1 season breeding, 1 season gestation, 1 season birth
 const litterSize int = 1
 const foodProduction int = 1
 const lumberProduction int = 1
@@ -47,12 +47,12 @@ type Creature struct {
     Action string
     PartnerID int
     PartnerStats *CreatureStats
-    GestationDay int
+    GestationSeason int
 }
 
 func (creature *Creature) Cost() int {
     if creature.Action == PREGNANT {
-        return creature.Stats.Age * creature.Stats.Age * creatureCost + creature.GestationDay * breedingCost
+        return creature.Stats.Age * creature.Stats.Age * creatureCost + creature.GestationSeason * breedingCost
     } else {
         return creature.Stats.Age * creature.Stats.Age * creatureCost
     }
@@ -96,13 +96,14 @@ func (creature *Creature) Breed(partner Creature) {
 
     creature.PartnerStats = partner.Stats
     creature.Action = PREGNANT
-    creature.GestationDay = 1
+    creature.GestationSeason = 0
     creature.Stats.LitterSize = litterSize
 }
 
 func (creature *Creature) Gestate() {
-    if creature.GestationDay != gestationPeriod {
-        creature.GestationDay += 1
+    // - 2 for breeding and spawning
+    if creature.GestationSeason != gestationPeriod - 2 {
+        creature.GestationSeason += 1
         return
     }
 
@@ -112,7 +113,7 @@ func (creature *Creature) Gestate() {
 func (creature *Creature) SpawnLitter() []*Creature {
     creature.Action = NOTHING
     creature.PartnerID = 0
-    creature.GestationDay = 0
+    creature.GestationSeason = 0
     children := []*Creature{}
 
     for i := 0 ; i < creature.Stats.LitterSize / 100 ; i += 1 {

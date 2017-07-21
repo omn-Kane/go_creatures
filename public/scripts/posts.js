@@ -5,8 +5,8 @@ function breedWith(session, creature1ID, creature2ID) {
         });
 }
 
-function setInstruction(session, day, creatureID, action) {
-    $.post('/setAction?Session=' + session + "&Day=" + day + "&CreatureID=" + creatureID + "&Action=" + action,
+function setInstruction(session, season, creatureID, action) {
+    $.post('/setAction?Session=' + session + "&Season=" + season + "&CreatureID=" + creatureID + "&Action=" + action,
         function(data) {
             if (data !== "false") document.getElementById("creature_action_" + creatureID).innerHTML = data;
         });

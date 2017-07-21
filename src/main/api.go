@@ -35,7 +35,7 @@ func main() {
     http.Handle("/graphql", corsHandler(graphqlHandler))
 
     http.HandleFunc("/start/", start)
-    http.HandleFunc("/endDay", endDay)
+    http.HandleFunc("/endSeason", endSeason)
     http.HandleFunc("/breedWith", breedWith)
     http.HandleFunc("/setAction", setAction)
     http.HandleFunc("/temp/", tempFunc)
@@ -63,19 +63,19 @@ func start(w http.ResponseWriter, req *http.Request) {
     if err != nil { log.Panic(err) }
 }
 
-func endDay(w http.ResponseWriter, req *http.Request) {
-    // log.Println("End of Day")
+func endSeason(w http.ResponseWriter, req *http.Request) {
+    // log.Println("End of Season")
     var err error
     asJson, boolParseErr := strconv.ParseBool(getParam(req, "json", 0))
 
     session := getParam(req, "Session", 0)
-    newDay := EndDay(session)
+    newSeason := EndSeason(session)
     if boolParseErr == nil && asJson {
-        theJson, errJson := json.Marshal(newDay)
+        theJson, errJson := json.Marshal(newSeason)
         if errJson != nil { log.Panic(errJson) }
         fmt.Fprintf(w, string(theJson))
     } else {
-        err = templates["start"].Execute(w, newDay)
+        err = templates["start"].Execute(w, newSeason)
         if err != nil { log.Panic(err) }
     }
 }
@@ -92,10 +92,10 @@ func breedWith(w http.ResponseWriter, req *http.Request) {
 func setAction(w http.ResponseWriter, req *http.Request) {
     // log.Println("SetAction")
     session := getParam(req, "Session", 0)
-    day, _ := strconv.Atoi(getParam(req, "Day", 0))
+    season, _ := strconv.Atoi(getParam(req, "Season", 0))
     creatureID, _ := strconv.Atoi(getParam(req, "CreatureID", 0))
     action := getParam(req, "Action", 0)
-    result := SetAction(session, day, creatureID, action)
+    result := SetAction(session, season, creatureID, action)
     fmt.Fprintf(w, result)
 }
 

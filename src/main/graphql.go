@@ -23,13 +23,13 @@ func (s ByID) Less(i, j int) bool {
 
 func creatureResolver(p graphql.ResolveParams) (interface{}, error) {
     session, hasSession := p.Args["Session"]
-    day, hasDay := p.Args["Day"]
+    season, hasSeason := p.Args["Season"]
     offset, hasOffset := p.Args["Offset"]
     limit, hasLimit := p.Args["Limit"]
 
     var creatures []*Creature
-    if hasSession && hasDay {
-        creaturesMap := GetCreatures(session.(string), day.(int))
+    if hasSession && hasSeason {
+        creaturesMap := GetCreatures(session.(string), season.(int))
         for _, creature := range creaturesMap {
             creatures = append(creatures, creature)
         }
@@ -74,7 +74,7 @@ var creatureType = graphql.NewObject(graphql.ObjectConfig{
         "Action": &graphql.Field{Type: graphql.String},
         "PartnerID": &graphql.Field{Type: graphql.Int},
         "PartnerStats": &graphql.Field{Type: statsType},
-        "GestationDay": &graphql.Field{Type: graphql.Int},
+        "GestationSeason": &graphql.Field{Type: graphql.Int},
     },
 })
 
@@ -107,7 +107,7 @@ var contextType = graphql.NewObject(graphql.ObjectConfig{
     Name: "Context",
     Fields: graphql.Fields{
         "Session": &graphql.Field{Type: graphql.String},
-        "Day": &graphql.Field{Type: graphql.Int},
+        "Season": &graphql.Field{Type: graphql.Int},
         "Play": &graphql.Field{Type: playType},
     },
 })
@@ -119,13 +119,13 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
             Type: contextType,
             Args: graphql.FieldConfigArgument{
                 "Session": &graphql.ArgumentConfig{Type: graphql.String},
-                "Day": &graphql.ArgumentConfig{Type: graphql.Int},
+                "Season": &graphql.ArgumentConfig{Type: graphql.Int},
             },
             Resolve: func(p graphql.ResolveParams) (interface{}, error) {
                 session, hasSession := p.Args["Session"]
-                day, hasDay := p.Args["Day"]
-                if hasSession && hasDay {
-                    return GetSession(session.(string), day.(int)), nil
+                season, hasSeason := p.Args["Season"]
+                if hasSession && hasSeason {
+                    return GetSession(session.(string), season.(int)), nil
                 }
                 return NewPlaySession(""), nil
             },
@@ -134,7 +134,7 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
             Type: graphql.NewList(creatureType),
             Args: graphql.FieldConfigArgument{
                 "Session": &graphql.ArgumentConfig{Type: graphql.String},
-                "Day": &graphql.ArgumentConfig{Type: graphql.Int},
+                "Season": &graphql.ArgumentConfig{Type: graphql.Int},
                 "Offset": &graphql.ArgumentConfig{Type: graphql.Int},
                 "Limit": &graphql.ArgumentConfig{Type: graphql.Int},
             },
@@ -146,7 +146,7 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 var rootMutation = graphql.NewObject(graphql.ObjectConfig{
     Name: "Mutation",
     Fields: graphql.Fields{
-        "EndDay": &graphql.Field{
+        "EndSeason": &graphql.Field{
             Type: contextType,
             Args: graphql.FieldConfigArgument{
                 "Session": &graphql.ArgumentConfig{Type: graphql.String},
@@ -154,7 +154,7 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
             Resolve: func(p graphql.ResolveParams) (interface{}, error) {
                 session, hasSession := p.Args["Session"]
                 if hasSession {
-                    return EndDay(session.(string)), nil
+                    return EndSeason(session.(string)), nil
                 } else {
                     return GetRecordWithSession(session.(string)), nil
                 }
@@ -164,17 +164,17 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
             Type: creatureType,
             Args: graphql.FieldConfigArgument{
                 "Session": &graphql.ArgumentConfig{Type: graphql.String},
-                "Day": &graphql.ArgumentConfig{Type: graphql.Int},
+                "Season": &graphql.ArgumentConfig{Type: graphql.Int},
                 "ID": &graphql.ArgumentConfig{Type: graphql.Int},
                 "Action": &graphql.ArgumentConfig{Type: graphql.String},
             },
             Resolve: func(p graphql.ResolveParams) (interface{}, error) {
                 session, hasSession := p.Args["Session"]
-                day, hasDay := p.Args["Day"]
+                season, hasSeason := p.Args["Season"]
                 id, hasID := p.Args["ID"]
                 action, hasAction := p.Args["Action"]
-                if hasSession && hasDay && hasID && hasAction {
-                    return &Creature{Action: SetAction(session.(string), day.(int), id.(int), action.(string))}, nil
+                if hasSession && hasSeason && hasID && hasAction {
+                    return &Creature{Action: SetAction(session.(string), season.(int), id.(int), action.(string))}, nil
                 }
                 return &Creature{}, nil
             },

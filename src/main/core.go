@@ -17,7 +17,7 @@ type PlayDict struct {
 
 type Context struct {
     Session string
-    Day int
+    Season int
     Play PlayDict
 }
 
@@ -63,27 +63,27 @@ func NewPlaySession(session string) Context {
     return context
 }
 
-func SearchDatabase(session string, day int) Context {
-    currentSession := GetRecord(session, day)
+func SearchDatabase(session string, season int) Context {
+    currentSession := GetRecord(session, season)
     if currentSession.Session == "" { return NewPlaySession(session) }
     sessions[currentSession.Session] = &currentSession
     return currentSession
 }
 
-func GetSession(session string, day int) Context {
+func GetSession(session string, season int) Context {
     currentSession, foundSession := sessions[session]
-    // log.Println("EndDay", currentSession, sessionFound);
-    if !foundSession || currentSession.Day != day { return SearchDatabase(session, day) }
+    // log.Println("EndSeason", currentSession, sessionFound);
+    if !foundSession || currentSession.Season != season { return SearchDatabase(session, season) }
     return *currentSession
 }
 
-func EndDay(session string) Context {
+func EndSeason(session string) Context {
     currentSession, foundSession := sessions[session]
-    // log.Println("EndDay", currentSession, sessionFound);
+    // log.Println("EndSeason", currentSession, sessionFound);
     if !foundSession { return SearchDatabase(session, 0) }
 
 
-    currentSession.CompleteDay()
+    currentSession.CompleteSeason()
     currentSession.InsertRecord()
     currentSession.InsertCreatures()
 
@@ -96,7 +96,7 @@ func EndDay(session string) Context {
 
 func BreedWith(session string, creature1ID int, creature2ID int) bool {
     currentSession, sessionFound := sessions[session]
-    // log.Println("EndDay", currentSession, sessionFound);
+    // log.Println("EndSeason", currentSession, sessionFound);
     if !sessionFound { return false }
     creature1 := currentSession.Play.Creatures[creature1ID]
     // if !foundCreature1 { return false }
@@ -105,12 +105,12 @@ func BreedWith(session string, creature1ID int, creature2ID int) bool {
     return creature1.BreedWith(creature2)
 }
 
-func SetAction(session string, day int, creatureID int, action string) string {
+func SetAction(session string, season int, creatureID int, action string) string {
     var sessionss Context
     currentSession, sessionFound := sessions[session]
 
-    if !sessionFound || currentSession.Day != day {
-        sessionss = SearchDatabase(session, day)
+    if !sessionFound || currentSession.Season != season {
+        sessionss = SearchDatabase(session, season)
         currentSession = &sessionss
     }
     creature := currentSession.Play.Creatures[creatureID]
@@ -119,17 +119,17 @@ func SetAction(session string, day int, creatureID int, action string) string {
     return creature.SetAction(action)
 }
 
-func (session *Context) CompleteDay() {
-    session.Day += 1
+func (session *Context) CompleteSeason() {
+    session.Season += 1
     session.Play.Food -= session.Play.CreaturesCost
     if session.Play.Food <= 0 { return }
 
     session.Play.SellCreatures()
+    session.Play.PartnerBreedingCreatures()
+    session.Play.BreedCreatures()
+    session.Play.WorkCreatures()
     session.Play.BirthCreatures()
     session.Play.GestateCreatures()
-    session.Play.PartnerBreedingCreatures()
-    session.Play.WorkCreatures()
-    session.Play.BreedCreatures()
     session.Play.AgeCreatures()
     session.Play.SetTotalCost()
 }

@@ -10,16 +10,16 @@ import (
 var schema = `
 CREATE TABLE IF NOT EXISTS playsessions (
     session VARCHAR,
-    day INTEGER,
+    season INTEGER,
     play VARCHAR,
-    UNIQUE(session, day) ON CONFLICT REPLACE
+    UNIQUE(session, season) ON CONFLICT REPLACE
 );
 
 CREATE TABLE IF NOT EXISTS creatures (
     session VARCHAR,
-    day INTEGER,
+    season INTEGER,
     creatures VARCHAR,
-    UNIQUE(session, day) ON CONFLICT REPLACE
+    UNIQUE(session, season) ON CONFLICT REPLACE
 );
 `
 
@@ -39,18 +39,18 @@ func (c *Context) InsertRecord() {
     if errJson != nil { log.Panic(errJson) }
     // log.Println(string(playString))
 
-    _, err = db.Exec("REPLACE INTO playsessions (session, day, play) VALUES ($1, $2, $3)", c.Session, c.Day, playString)
+    _, err = db.Exec("REPLACE INTO playsessions (session, season, play) VALUES ($1, $2, $3)", c.Session, c.Season, playString)
     if err != nil { log.Panic(err) }
 }
 
-func GetRecord(session string, day int) Context {
+func GetRecord(session string, season int) Context {
     record := Context{}
-    if day == 0 {
+    if season == 0 {
         record = GetRecordWithSession(session)
     } else {
-        record = GetRecordWithSessionAndDay(session, day)
+        record = GetRecordWithSessionAndSeason(session, season)
     }
-    record.Play.Creatures = GetCreatures(record.Session, record.Day)
+    record.Play.Creatures = GetCreatures(record.Session, record.Season)
 
     return record
 }
@@ -59,7 +59,7 @@ func GetRecordWithSession(session string) Context {
     record := &Context{}
     var tempPlay []byte
 
-    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? ORDER BY day DESC LIMIT 1", session).Scan(&record.Session, &record.Day, &tempPlay)
+    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? ORDER BY season DESC LIMIT 1", session).Scan(&record.Session, &record.Season, &tempPlay)
     if err != nil { return Context{} }
 
     err = json.Unmarshal(tempPlay, &record.Play)
@@ -68,11 +68,11 @@ func GetRecordWithSession(session string) Context {
     return *record
 }
 
-func GetRecordWithSessionAndDay(session string, day int) Context {
+func GetRecordWithSessionAndSeason(session string, season int) Context {
     record := &Context{}
     var tempPlay []byte
 
-    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? AND day=? LIMIT 1", session, day).Scan(&record.Session, &record.Day, &tempPlay)
+    err = db.QueryRow("SELECT * FROM playsessions WHERE session=? AND season=? LIMIT 1", session, season).Scan(&record.Session, &record.Season, &tempPlay)
     if err != nil { return Context{} }
 
     err = json.Unmarshal(tempPlay, &record.Play)
@@ -86,16 +86,16 @@ func (c *Context) InsertCreatures() {
     if errJson != nil { log.Panic(errJson) }
     // log.Println(string(creaturesString))
 
-    _, err = db.Exec("REPLACE INTO creatures (session, day, creatures) VALUES ($1, $2, $3)", c.Session, c.Day, creaturesString)
+    _, err = db.Exec("REPLACE INTO creatures (session, season, creatures) VALUES ($1, $2, $3)", c.Session, c.Season, creaturesString)
     if err != nil { log.Panic(err) }
 }
 
-func GetCreatures(session string, day int) map[int] *Creature {
-    // log.Println(session, day)
+func GetCreatures(session string, season int) map[int] *Creature {
+    // log.Println(session, season)
     var record map[int] *Creature
     var byteArray []byte
 
-    err = db.QueryRow("SELECT creatures FROM creatures WHERE session=? AND day=? LIMIT 1", session, day).Scan(&byteArray)
+    err = db.QueryRow("SELECT creatures FROM creatures WHERE session=? AND season=? LIMIT 1", session, season).Scan(&byteArray)
     // log.Println(string(byteArray), err)
     if err != nil { return record }
 

@@ -9,7 +9,7 @@
 </head>
 <body>
     {{$session := .Session}}
-    {{$day := .Day}}
+    {{$season := .Season}}
     <div class="resources">
         <span>My session: {{$session}}</span>
     </div>
@@ -21,9 +21,9 @@
     <div class="resources">
         <span>Creatures: {{len .Play.Creatures}}/{{.Play.Housing}}</span>
         <span>Creatures Cost: {{.Play.CreaturesCost}}</span>
-        <span>Current Day: {{.Day}}</span>
+        <span>Current Season: {{.Season}}</span>
     </div>
-    <div class="end-day-button"><a href="/endDay?Session={{.Session}}">End Day</a></div>
+    <div class="end-season-button"><a href="/endSeason?Session={{.Session}}">End Season</a></div>
     <table class="table">
         <thead class="tableheader">
             <tr>
@@ -53,12 +53,12 @@
                 </td>
                 <td class="actions">
                     {{ if gt $creature.Stats.Age 2 }}
-                    <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Nothing')"/>
-                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Breeding')"/>
-                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Farming')"/>
-                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Lumberjacking')"/>
-                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Constructing')"/>
-                    <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Sell')"/>
+                    <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Nothing')"/>
+                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Breeding')"/>
+                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Farming')"/>
+                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Lumberjacking')"/>
+                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Constructing')"/>
+                    <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Sell')"/>
                     {{ end }}
                 </td>
             </tr>
