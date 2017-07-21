@@ -63,23 +63,35 @@ func NewPlaySession(session string) Context {
     return context
 }
 
-func SearchDatabase(session string) Context {
-    currentSession := GetRecord(session, 0)
+func SearchDatabase(session string, day int) Context {
+    currentSession := GetRecord(session, day)
     if currentSession.Session == "" { return NewPlaySession(session) }
     sessions[currentSession.Session] = &currentSession
     return currentSession
 }
 
+func GetSession(session string, day int) Context {
+    currentSession, foundSession := sessions[session]
+    // log.Println("EndDay", currentSession, sessionFound);
+    if !foundSession || currentSession.Day != day { return SearchDatabase(session, day) }
+    return *currentSession
+}
+
 func EndDay(session string) Context {
     currentSession, foundSession := sessions[session]
     // log.Println("EndDay", currentSession, sessionFound);
-    if !foundSession { return SearchDatabase(session) }
+    if !foundSession { return SearchDatabase(session, 0) }
+
 
     currentSession.CompleteDay()
     currentSession.InsertRecord()
     currentSession.InsertCreatures()
 
-    return *currentSession
+    if currentSession.Play.Food < 0 || len(currentSession.Play.Creatures) == 0 {
+        return NewPlaySession(session)
+    } else {
+        return *currentSession
+    }
 }
 
 func BreedWith(session string, creature1ID int, creature2ID int) bool {
@@ -93,11 +105,17 @@ func BreedWith(session string, creature1ID int, creature2ID int) bool {
     return creature1.BreedWith(creature2)
 }
 
-func SetAction(session string, creatureID int, action string) string {
+func SetAction(session string, day int, creatureID int, action string) string {
+    var sessionss Context
     currentSession, sessionFound := sessions[session]
-    // log.Println("EndDay", currentSession, sessionFound);
-    if !sessionFound { return "false" }
+
+    if !sessionFound || currentSession.Day != day {
+        sessionss = SearchDatabase(session, day)
+        currentSession = &sessionss
+    }
     creature := currentSession.Play.Creatures[creatureID]
+    if creature == nil || creature.ID != creatureID { return NOTHING }
+
     return creature.SetAction(action)
 }
 

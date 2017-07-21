@@ -70,24 +70,13 @@ func endDay(w http.ResponseWriter, req *http.Request) {
 
     session := getParam(req, "Session", 0)
     newDay := EndDay(session)
-    if newDay.Play.Food < 0 || len(newDay.Play.Creatures) == 0 {
-        if boolParseErr == nil && asJson {
-            theJson, errJson := json.Marshal(NewPlaySession(session))
-            if errJson != nil { log.Panic(errJson) }
-            fmt.Fprintf(w, string(theJson))
-        } else {
-            err = templates["start"].Execute(w, NewPlaySession(session))
-            if err != nil { log.Panic(err) }
-        }
+    if boolParseErr == nil && asJson {
+        theJson, errJson := json.Marshal(newDay)
+        if errJson != nil { log.Panic(errJson) }
+        fmt.Fprintf(w, string(theJson))
     } else {
-        if boolParseErr == nil && asJson {
-            theJson, errJson := json.Marshal(newDay)
-            if errJson != nil { log.Panic(errJson) }
-            fmt.Fprintf(w, string(theJson))
-        } else {
-            err = templates["start"].Execute(w, newDay)
-            if err != nil { log.Panic(err) }
-        }
+        err = templates["start"].Execute(w, newDay)
+        if err != nil { log.Panic(err) }
     }
 }
 
@@ -103,9 +92,10 @@ func breedWith(w http.ResponseWriter, req *http.Request) {
 func setAction(w http.ResponseWriter, req *http.Request) {
     // log.Println("SetAction")
     session := getParam(req, "Session", 0)
+    day, _ := strconv.Atoi(getParam(req, "Day", 0))
     creatureID, _ := strconv.Atoi(getParam(req, "CreatureID", 0))
     action := getParam(req, "Action", 0)
-    result := SetAction(session, creatureID, action)
+    result := SetAction(session, day, creatureID, action)
     fmt.Fprintf(w, result)
 }
 

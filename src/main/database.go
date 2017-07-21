@@ -44,11 +44,15 @@ func (c *Context) InsertRecord() {
 }
 
 func GetRecord(session string, day int) Context {
+    record := Context{}
     if day == 0 {
-        return GetRecordWithSession(session)
+        record = GetRecordWithSession(session)
     } else {
-        return GetRecordWithSessionAndDay(session, day)
+        record = GetRecordWithSessionAndDay(session, day)
     }
+    record.Play.Creatures = GetCreatures(record.Session, record.Day)
+
+    return record
 }
 
 func GetRecordWithSession(session string) Context {

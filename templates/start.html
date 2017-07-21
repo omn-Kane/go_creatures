@@ -9,6 +9,7 @@
 </head>
 <body>
     {{$session := .Session}}
+    {{$day := .Day}}
     <div class="resources">
         <span>My session: {{$session}}</span>
     </div>
@@ -54,12 +55,12 @@
                 </td>
                 <td class="actions">
                     {{ if gt $creature.Stats.Age 2 }}
-                    <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Nothing')"/>
-                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Breeding')"/>
-                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Farming')"/>
-                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Lumberjacking')"/>
-                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Constructing')"/>
-                    <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$creature.ID}}, 'Sell')"/>
+                    <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Nothing')"/>
+                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Breeding')"/>
+                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Farming')"/>
+                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Lumberjacking')"/>
+                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Constructing')"/>
+                    <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$day}}, {{$creature.ID}}, 'Sell')"/>
                     {{ end }}
                 </td>
             </tr>
