@@ -151,15 +151,15 @@ func (playDict *PlayDict) SellCreatures() {
 
 func (playDict *PlayDict) WorkCreatures() {
     for _, creature := range playDict.Creatures {
-        if creature.Action == FARMING || creature.Action == NOTHING && creature.Stats.Age > adultAge{
+        if creature.Action == FARMING || creature.Action == NOTHING && creature.Stats.Age >= adultAge {
             playDict.Food += creature.ProduceFood()
             continue
         }
-        if creature.Action == LUMBERJACKING {
+        if creature.Action == LUMBERJACK {
             playDict.Lumber += creature.ProduceLumber()
             continue
         }
-        if creature.Action == CONSTRUCTING {
+        if creature.Action == CONSTRUCT {
             housingCost := playDict.Housing * playDict.Housing
             if housingCost < playDict.Lumber {
                 playDict.Housing += 1
@@ -171,7 +171,7 @@ func (playDict *PlayDict) WorkCreatures() {
 
 func (playDict *PlayDict) BreedCreatures() {
     for _, creature := range playDict.Creatures {
-        if creature.Action != BREEDING { continue }
+        if creature.Action != BREED { continue }
         partner, found := playDict.Creatures[creature.PartnerID]
         if !found {
             creature.Action = NOTHING
@@ -218,7 +218,7 @@ func (playDict *PlayDict) PartnerBreedingCreatures() {
     females := []*Creature{}
     epicenes := []*Creature{}
     for _, creature := range playDict.Creatures {
-        if creature.Action != BREEDING { continue }
+        if creature.Action != BREED { continue }
         if creature.PartnerID != 0 { continue }
 
         if creature.Sex == MALE {

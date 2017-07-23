@@ -54,10 +54,10 @@
                 <td class="actions">
                     {{ if gt $creature.Stats.Age 2 }}
                     <input type="button" value="Nothing" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Nothing')"/>
-                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Breeding')"/>
-                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Farming')"/>
-                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Lumberjacking')"/>
-                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Constructing')"/>
+                    <input type="button" value="Breed" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Breed')"/>
+                    <input type="button" value="Farm" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Farm')"/>
+                    <input type="button" value="Lumberjack" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Lumberjack')"/>
+                    <input type="button" value="Construct" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Construct')"/>
                     <input type="button" value="Sell" onclick="setInstruction({{$session}}, {{$season}}, {{$creature.ID}}, 'Sell')"/>
                     {{ end }}
                 </td>

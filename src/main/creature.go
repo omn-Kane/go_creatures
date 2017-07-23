@@ -20,12 +20,11 @@ const (
     FEMALE = "Female"
     EPICENE = "Epicene"
     NOTHING = "Nothing"
-    BREEDING = "Breeding"
+    BREED = "Breed"
     PREGNANT = "Pregnant"
     FARMING = "Farming"
-    LUMBERJACKING = "Lumberjacking"
-    CONSTRUCTING = "Constructing"
-    PONDER = "Ponder"
+    LUMBERJACK = "Lumberjack"
+    CONSTRUCT = "Construct"
     SPAWNING = "Spawning"
     SELL = "Sell"
 )
@@ -64,8 +63,8 @@ func (creature1 *Creature) BreedWith(creature2 *Creature) bool {
     creature1.PartnerID = creature2.ID
     creature2.PartnerID = creature1.ID
 
-    creature1.Action = BREEDING
-    creature2.Action = BREEDING
+    creature1.Action = BREED
+    creature2.Action = BREED
 
     return true
 }
@@ -75,7 +74,7 @@ func (creature1 *Creature) CanBreedWith(creature2 *Creature) bool {
     if (creature1.ID == creature2.ID) { return false }
 
     // if either creature is already breeding, don't allow breeding
-    if (creature1.Action == BREEDING || creature2.Action == BREEDING) { return false }
+    if (creature1.Action == BREED || creature2.Action == BREED) { return false }
 
     // if either creature already has a partner, don't allow breeding
     if (creature1.PartnerID != 0 || creature2.PartnerID != 0) { return false }
@@ -167,7 +166,7 @@ func (creature *Creature) ProduceLumber() int {
 }
 
 func (creature *Creature) SetAction(action string) string {
-    if creature.Action != PREGNANT && creature.Action != SPAWNING{
+    if creature.Action != PREGNANT && creature.Action != SPAWNING && creature.Stats.Age >= adultAge {
         creature.Action = action
     }
 
