@@ -10,6 +10,7 @@ func importGraphQLLog() {
     log.Println("sigh at import")
 }
 
+// Helper for sorting creatures based on their ID
 type ByID []*Creature
 func (s ByID) Len() int {
     return len(s)
@@ -21,6 +22,7 @@ func (s ByID) Less(i, j int) bool {
     return s[i].ID < s[j].ID
 }
 
+// A Resolver that gets reused
 func creatureResolver(p graphql.ResolveParams) (interface{}, error) {
     session, hasSession := p.Args["Session"]
     season, hasSeason := p.Args["Season"]
