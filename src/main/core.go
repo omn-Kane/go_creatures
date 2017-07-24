@@ -25,6 +25,7 @@ var sessions map[string] *Context
 
 var sessionValueLength = 16
 var adultAge = 3
+var startingFarming = 20
 var startingFood = 20000
 var startingLumber = 0
 var startingHousing = 10
@@ -49,8 +50,8 @@ func NewPlaySession(session string) Context {
     }
 
     creatures := make(map[int] *Creature)
-    creatures[1] = &Creature{ID:1, Sex:MALE, Stats:&CreatureStats{Age:3, Longevity:15, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
-    creatures[2] = &Creature{ID:2, Sex:FEMALE, Stats:&CreatureStats{Age:3, Longevity:15, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
+    creatures[1] = &Creature{ID:1, Sex:MALE, Stats:&CreatureStats{Age:3, Longevity:15, Farming: startingFarming, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
+    creatures[2] = &Creature{ID:2, Sex:FEMALE, Stats:&CreatureStats{Age:3, Longevity:15, Farming: startingFarming, EpiceneChance: 5, MultiBirthChance: 100}, Action: NOTHING}
 
     playDict := PlayDict{startingFood, startingLumber, startingHousing, creatures, 0, 2}
     playDict.SetTotalCost()
