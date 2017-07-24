@@ -143,6 +143,16 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
     },
 })
 
+var setActionInputType = graphql.NewInputObject(
+    graphql.InputObjectConfig{
+        Name: "SetCreatureAction",
+        Fields: graphql.InputObjectConfigFieldMap{
+            "ID": &graphql.InputObjectFieldConfig{Type: graphql.Int},
+            "Action": &graphql.InputObjectFieldConfig{Type: graphql.String},
+        },
+    },
+)
+
 var rootMutation = graphql.NewObject(graphql.ObjectConfig{
     Name: "Mutation",
     Fields: graphql.Fields{
@@ -177,6 +187,27 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
                     return &Creature{Action: SetAction(session.(string), season.(int), id.(int), action.(string))}, nil
                 }
                 return &Creature{}, nil
+            },
+        },
+        "BulkSetAction": &graphql.Field{
+            Type: graphql.String,
+            Args: graphql.FieldConfigArgument{
+                "Session": &graphql.ArgumentConfig{Type: graphql.String},
+                "Season": &graphql.ArgumentConfig{Type: graphql.Int},
+                "Actions": &graphql.ArgumentConfig{Type: graphql.NewList(setActionInputType)},
+            },
+            Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+                session, hasSession := p.Args["Session"]
+                season, hasSeason := p.Args["Season"]
+                actions, hasActions := p.Args["Actions"]
+                if hasSession && hasSeason && hasActions {
+                    realActions := actions.([]interface{})
+                    for _, action := range realActions {
+                        realAction := action.(map[string]interface {})
+                        SetAction(session.(string), season.(int), realAction["ID"].(int), realAction["Action"].(string))
+                    }
+                }
+                return "True", nil
             },
         },
     },

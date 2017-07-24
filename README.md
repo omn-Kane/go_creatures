@@ -15,3 +15,4 @@ curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql'
 
 curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'query { Creatures(Session:"YyXOqB8QhMqEm2Pz", Season:20, Offset: 10, Limit: 10) { ID Sex Stats{ Age Agility } } }'
 curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'mutation { EndSeason(Session:"YyXOqB8QhMqEm2Pz") { Session Season } }'
+curl -XPOST http://localhost:8080/graphql -H 'Content-Type: application/graphql' -d 'mutation { BulkSetAction(Session:"NoPZOFiCzXcwKqYk", Season: 0, Actions:[{ID: 1, Action: "Breed"}, {ID: 2, Action: "Breed"}]) }'
